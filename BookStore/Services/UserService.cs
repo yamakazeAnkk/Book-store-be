@@ -16,6 +16,8 @@ namespace BookStore.Services
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
 
+        
+
         public UserService(IUserRepository userRepository, IMapper mapper){
             _userRepository = userRepository;
             _mapper = mapper;
@@ -43,7 +45,7 @@ namespace BookStore.Services
 
             var user = _mapper.Map<User>(userDto);
             user.Password = BCrypt.Net.BCrypt.HashPassword(userDto.Password);
-            user.RoleId = 2;
+            user.RoleId = 3;
             
             await _userRepository.AddUserAsync(user);
             await _userRepository.SaveChangeAsync();

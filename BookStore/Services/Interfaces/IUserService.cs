@@ -12,5 +12,7 @@ namespace BookStore.Services.Interfaces
         Task<User> RegisterUserAsync(UserDto userDto);
 
         Task<User> LoginUserAsync(LoginDto loginDto);
+
+        
     }
 }

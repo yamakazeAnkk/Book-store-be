@@ -30,6 +30,11 @@ namespace BookStore.Repositories
             return await _bookStoreContext.Roles.SingleOrDefaultAsync(u => u.RoleName == role);
         }
 
+        public async Task<User> GetUserByEmailAsync(string email)
+        {
+            return await _bookStoreContext.Users.FirstOrDefaultAsync(u => u.Email == email);
+        }
+
         public async Task<User> GetUserByIdAsync(int userId)
         {
             return await  _bookStoreContext.Users.FindAsync(userId);

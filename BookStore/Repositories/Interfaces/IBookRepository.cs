@@ -9,13 +9,19 @@ namespace BookStore.Repositories.Interfaces
 {
     public interface IBookRepository
     {
-        Task<Book> GetBookByIdAsync(int bookId);
+        Task<Book> GetBookByIdAsync(int? bookId);
         
         Task<IEnumerable<Book>> GetBooksPagedAsync(int pageNumber, int pageSize);
 
-        Task AddBookAsync(Book book);
+        Task<Book> AddBookAsync(Book book);
         Task UpdateBookAsync(Book book);
 
         Task DeleteBookAsync (int id);
+        Task AddBookBrandAsync(BookBrand bookBrand);
+
+        Task<IEnumerable<Book>> SearchBooksByTitleAsync(string title, int page, int size);
+        Task<IEnumerable<Book>> FilterBooksByBrandAsync(int brandId, int page, int size);
+        Task<IEnumerable<Book>> SortBooksByPriceAsync(decimal min, decimal max, int page, int size);
+        
     }
 }

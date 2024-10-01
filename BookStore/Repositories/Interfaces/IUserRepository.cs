@@ -20,5 +20,7 @@ namespace BookStore.Repositories.Interfaces
 
         Task<Role> GetRoleByNameAsync(string role);
 
+        Task<User> GetUserByEmailAsync(string email);
+
     }
 }
