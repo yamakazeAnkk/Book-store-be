@@ -17,13 +17,18 @@ namespace BookStore.Controllers
     {
         private readonly IOrderService _orderService;
 
-        public OrdersController(IOrderService orderService){
+        private readonly HttpContextAccessor _httpContextAccessor;
+        public OrdersController(IOrderService orderService, HttpContextAccessor httpContextAccessor){
             _orderService = orderService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         [HttpGet("recent")]
         public async Task<IActionResult> GetRecentOrders(int page = 0, int size = 5)
         {
+            var emailUser = User.FindFirst(ClaimTypes.Email)?.Value;
+                if (string.IsNullOrEmpty(emailUser))
+                    return Unauthorized("User not authenticated");
             var orders = await _orderService.GetOrdersRecentAsync(page, size);
             return Ok(orders);
         }

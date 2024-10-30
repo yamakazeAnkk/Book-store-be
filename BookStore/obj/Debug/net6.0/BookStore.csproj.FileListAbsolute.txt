@@ -90,3 +90,6 @@
 /Users/nguyenan/StudioProjects/BookStore/BookStore/obj/Debug/net6.0/BookStore.pdb
 /Users/nguyenan/StudioProjects/BookStore/BookStore/obj/Debug/net6.0/BookStore.genruntimeconfig.cache
 /Users/nguyenan/StudioProjects/BookStore/BookStore/obj/Debug/net6.0/ref/BookStore.dll
+/Users/nguyenan/StudioProjects/BookStore/BookStore/bin/Debug/net6.0/Microsoft.AspNetCore.JsonPatch.dll
+/Users/nguyenan/StudioProjects/BookStore/BookStore/bin/Debug/net6.0/Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll
+/Users/nguyenan/StudioProjects/BookStore/BookStore/bin/Debug/net6.0/Newtonsoft.Json.Bson.dll

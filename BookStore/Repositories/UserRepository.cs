@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BookStore.DTOs;
 using BookStore.Models;
 using BookStore.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -23,6 +24,11 @@ namespace BookStore.Repositories
         public async Task<IEnumerable<User>> GetAllUserAsync()
         {
             return await _bookStoreContext.Users.ToListAsync();
+        }
+
+        public async Task<IEnumerable<User>> GetAllUserAsync(int page, int size)
+        {
+            return await _bookStoreContext.Users.Skip((page - 1) * size).Take(page).ToListAsync();
         }
 
         public async Task<Role> GetRoleByNameAsync(string role)
@@ -48,6 +54,12 @@ namespace BookStore.Repositories
         public async Task<bool> SaveChangeAsync()
         {
             return await _bookStoreContext.SaveChangesAsync() > 0;
+        }
+
+        public async Task UpdateUserByAsync(User user)
+        {
+            _bookStoreContext.Users.Update(user);
+            await _bookStoreContext.SaveChangesAsync();
         }
     }
 }

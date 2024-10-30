@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using BookStore.Models;
+using Newtonsoft.Json;
 
 namespace BookStore.DTOs
 {
@@ -22,6 +23,11 @@ namespace BookStore.DTOs
         public string? Description { get; set; }
 
         public string? Image { get; set; }
+
+        [JsonProperty("author_name")]
+        public string AuthorName { get; set; }
+
+        
 
 
         

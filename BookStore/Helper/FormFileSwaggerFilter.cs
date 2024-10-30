@@ -70,9 +70,10 @@ namespace BookStore.Helper
                         ["price"] = new OpenApiSchema { Type = "number", Format = "decimal" },
                         ["quantity"] = new OpenApiSchema { Type = "integer", Format = "int32" },
                         ["Description"] = new OpenApiSchema { Type = "string" },
-                        ["typeBookId"] = new OpenApiSchema { Type = "integer", Format = "int32", Nullable = true }
+                        ["typeBookId"] = new OpenApiSchema { Type = "integer", Format = "int32", Nullable = true },
+                        ["author_name"] = new OpenApiSchema { Type = "string" } 
                     },
-                    Required = new HashSet<string> { "title", "brandId", "price", "quantity" }
+                    Required = new HashSet<string> { "title", "brandId", "price", "quantity","author_name" }
                 });
                 
                 schema.Required = new HashSet<string> { "imageFile", "BookJson" };

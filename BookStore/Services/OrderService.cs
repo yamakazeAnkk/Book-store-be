@@ -22,23 +22,32 @@ namespace BookStore.Services
         private readonly IBookRepository _bookRepository;
 
         private readonly IOrderItemRepository _orderItemRepository;
+
+        private readonly IVoucherRepository _voucherRepository;
+
+        private readonly IVoucherUserRepository _voucherUserRepository;
         public OrderService(
             IOrderItemRepository orderItemRepository, 
             IMapper mapper, 
             IOrderRepository orderRepository,
             IBookRepository bookRepository,
             ICartItemRepository cartItemRepository,
-            IUserRepository userRepository){
+            IUserRepository userRepository,
+            IVoucherUserRepository voucherUserRepository,
+            IVoucherRepository voucherRepository
+            ){
             _orderRepository = orderRepository;
             _mapper = mapper;
             _userRepository = userRepository;
             _cartItemRepository = cartItemRepository;
             _bookRepository = bookRepository;
             _orderItemRepository = orderItemRepository;
+            _voucherRepository = voucherRepository;
+            _voucherUserRepository = voucherUserRepository;
         }
         public async Task CheckoutAsync(CreateOrderDto createOrderDto, string emailUser)
         {
-            var currentUser = await _userRepository.GetUserByEmailAsync(emailUser)?? throw new Exception("User not found");;
+            var currentUser = await _userRepository.GetUserByEmailAsync(emailUser)?? throw new Exception("User not found");
             var cartItems = await _cartItemRepository.GetCartItemsByUserIdAsync(currentUser.UserId);
             if(!cartItems.Any()){
                 throw new Exception("Cart is empty");
@@ -64,13 +73,25 @@ namespace BookStore.Services
                 order.OrderItems.Add(orderItems);
                 totalAmount += book.Price * cartItem.Quantity;
             }
+            
+            var voucherUser = await _voucherUserRepository.GetUnusedVoucherByUserIdAsync(currentUser.UserId);
+            if(voucherUser != null && voucherUser.IsUsed > 0){
+                var voucher = await _voucherRepository.GetVoucherByIdAsync(voucherUser.VoucherId);
+                if (voucher.ExpiredDate >= DateTime.UtcNow && totalAmount >= voucher.MinCost)
+                {
+                    decimal discount = Math.Min(voucher.Discount, totalAmount);
+                    totalAmount -= discount;
+                    
+                    voucherUser.IsUsed -= 1;
+                    await _voucherUserRepository.UpdateVoucherUserAsync(voucherUser);
+                }
+            }
             order.TotalAmount = totalAmount;
             await _orderRepository.AddOrderAsync(order);
             await _cartItemRepository.ClearCartItemsByUserIdAsync(currentUser.UserId);
 
 
-            return;
-            
+        
         }
 
         public async Task<IEnumerable<OrderItemDto>> GetBestSellersAsync(int amount)
@@ -82,7 +103,7 @@ namespace BookStore.Services
             .Select(pc => new OrderItemDto {
                 BookId = (int)pc.BookId,
                 Count = pc.Count,
-                Quantity = pc.Count, // Assuming Count and Quantity are the same here
+                Quantity = pc.Count, 
                 BookDto = _mapper.Map<BookDto>(pc.Book)
             }
 

@@ -17,7 +17,8 @@ namespace BookStore.Repositories.Interfaces
         Task UpdateBookAsync(Book book);
 
         Task DeleteBookAsync (int id);
-        Task AddBookBrandAsync(BookBrand bookBrand);
+        Task AddBookBrandAsync(List<BookBrand> bookBrand);
+       
 
         Task<IEnumerable<Book>> SearchBooksByTitleAsync(string title, int page, int size);
         Task<IEnumerable<Book>> FilterBooksByBrandAsync(int brandId, int page, int size);

@@ -32,9 +32,11 @@ namespace BookStore.Repositories
             return book;
         }
 
-        public async Task AddBookBrandAsync(BookBrand bookBrand)
+     
+
+        public async Task AddBookBrandAsync(List<BookBrand> bookBrand)
         {
-             _bookStoreContext.BookBrands.Add(bookBrand);
+             _bookStoreContext.BookBrands.AddRangeAsync(bookBrand);
             await _bookStoreContext.SaveChangesAsync();
         }
 
@@ -64,7 +66,7 @@ namespace BookStore.Repositories
             {
                 return null;
             }
-            return await _bookStoreContext.Books.FirstOrDefaultAsync(b => b.BookId == bookId);
+            return await _bookStoreContext.Books.Include(u => u.BookBrands).ThenInclude(x=> x.Band).FirstOrDefaultAsync(b => b.BookId == bookId);
         }
 
     
@@ -80,10 +82,10 @@ namespace BookStore.Repositories
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<Book>> SearchBooksByTitleAsync(string title, int page, int size)
+        public async Task<IEnumerable<Book>> SearchBooksByTitleAsync(string searchTerm, int page, int size)
         {
             return await _bookStoreContext.Books
-                .Where(b => EF.Functions.Like(b.Title,$"%{title}%"))
+                .Where(b => EF.Functions.Like(b.Title,$"%{searchTerm}%") || EF.Functions.Like(b.AuthorName,$"%{searchTerm}%") )
                 .Skip((page-1) * size)
                 .Take(size)
                 .ToListAsync();
@@ -113,4 +115,4 @@ namespace BookStore.Repositories
 
         }
     }
-}
+}  

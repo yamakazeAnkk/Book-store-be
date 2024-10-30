@@ -11,6 +11,7 @@ namespace BookStore.Models
             Orders = new HashSet<Order>();
             PurchasedEbooks = new HashSet<PurchasedEbook>();
             Reviews = new HashSet<Review>();
+            VoucherUsers = new HashSet<VoucherUser>();
         }
 
         public int UserId { get; set; }
@@ -18,8 +19,8 @@ namespace BookStore.Models
         public string Username { get; set; } = null!;
         public string Password { get; set; } = null!;
         public string Email { get; set; } = null!;
-        public string? Phone { get; set; }
-        public string? Fullname { get; set; }
+        public string Phone { get; set; } = null!;
+        public string Fullname { get; set; } = null!;
         public string? Address { get; set; }
         public int? RoleId { get; set; }
 
@@ -28,5 +29,6 @@ namespace BookStore.Models
         public virtual ICollection<Order> Orders { get; set; }
         public virtual ICollection<PurchasedEbook> PurchasedEbooks { get; set; }
         public virtual ICollection<Review> Reviews { get; set; }
+        public virtual ICollection<VoucherUser> VoucherUsers { get; set; }
     }
 }

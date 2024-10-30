@@ -7,6 +7,7 @@ namespace BookStore.DTOs
 {
     public class BookDetailsDto
     {
+        public int BookId { get; set; }
         public string Title { get; set; }
         public decimal Price { get; set; }
         public int Quantity { get; set; }
@@ -14,6 +15,8 @@ namespace BookStore.DTOs
         public string? Image { get; set; }
 
         public string? Description { get; set; }
+
+        public string AuthorName { get; set; }
 
         public List<string> BrandNames { get; set; }
     }

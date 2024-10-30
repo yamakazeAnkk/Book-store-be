@@ -15,38 +15,48 @@ namespace BookStore.Services
     public class BookService : IBookService
     {
 
+        
         private readonly IBookRepository _bookRepository;
         private readonly IMapper _mapper;
         private readonly FirebaseStorageService _firebaseStorageService;
 
         private readonly IBrandRepository _brandRepository;
 
-        public BookService(IBookRepository bookRepository, IMapper mapper, FirebaseStorageService firebaseStorageService,IBrandRepository brandRepository){
+        public BookService( IBookRepository bookRepository, IMapper mapper, FirebaseStorageService firebaseStorageService,IBrandRepository brandRepository){
             _bookRepository = bookRepository;
             _mapper = mapper;
             _firebaseStorageService = firebaseStorageService;
             _brandRepository = brandRepository;
+       
         }
-        public async Task<Book> AddBookAsync(BookDto bookDto)
+       public async Task<Book> AddBookAsync(BookDto bookDto)
         {
-           var book = _mapper.Map<Book>(bookDto);
+            // Ánh xạ BookDto sang Book
+            var book = _mapper.Map<Book>(bookDto);
 
-           var createBook = await _bookRepository.AddBookAsync(book);
-           if(bookDto.brandId != null && bookDto.brandId.Count > 0){
-                foreach (var brandId in bookDto.brandId)
-                {
-                    var brand = await _brandRepository.GetBrandByIdAsync(brandId);
-                    if(brand != null){
-                        var bookBrand = new BookBrand{
-                            BookId = createBook.BookId,
-                            BandId = brand.BrandId
-                        };
-                        await _bookRepository.AddBookBrandAsync(bookBrand);
-                    }
-                }
-           }
-           return createBook;
+            // Thêm Book vào cơ sở dữ liệu
+            var createdBook = await _bookRepository.AddBookAsync(book);
+
+            // Kiểm tra nếu có BrandId nào được cung cấp
+            if (bookDto.brandId != null && bookDto.brandId.Count > 0)
+            {
+                // Khởi tạo một danh sách các BookBrand để thêm vào một lần
+                var bookBrands = bookDto.brandId
+                    .Distinct() // Đảm bảo mỗi brandId chỉ thêm một lần
+                    .Select(brandId => new BookBrand
+                    {
+                        BookId = createdBook.BookId,
+                        BandId = brandId
+                    })
+                    .ToList();
+
+             
+                
+            }
+
+            return createdBook;
         }
+
 
 
         public async Task DeleteBookAsync(int bookId)
