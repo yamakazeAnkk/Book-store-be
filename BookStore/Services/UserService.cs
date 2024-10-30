@@ -16,11 +16,24 @@ namespace BookStore.Services
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
 
+        
+
         public UserService(IUserRepository userRepository, IMapper mapper){
             _userRepository = userRepository;
             _mapper = mapper;
         }
-        
+
+        public async Task<IEnumerable<UserDetailDto>> GetUserAllAsync(int page, int size)
+        {
+            var users = await _userRepository.GetAllUserAsync(page,size);
+            return _mapper.Map<IEnumerable<UserDetailDto>>(users);
+        }
+
+        public async Task<User> GetUserByEmailAsync(string email)
+        {
+            return await _userRepository.GetUserByEmailAsync(email);
+        }
+
         public async Task<User> LoginUserAsync(LoginDto loginDto)
         {
             
@@ -43,11 +56,23 @@ namespace BookStore.Services
 
             var user = _mapper.Map<User>(userDto);
             user.Password = BCrypt.Net.BCrypt.HashPassword(userDto.Password);
-            user.RoleId = 2;
+            user.RoleId = 3;
             
             await _userRepository.AddUserAsync(user);
             await _userRepository.SaveChangeAsync();
             return user;
+            
+        }
+
+        public async Task UpdateUserAsync(int id, CreateUserDetailDto createUserDetailDto)
+        {
+            var user = await _userRepository.GetUserByIdAsync(id);
+            if(user == null || user.RoleId != 2 && user.RoleId != 3 ){
+                throw new Exception("User not found");
+            }
+            _mapper.Map(createUserDetailDto,user);
+            await _userRepository.UpdateUserByAsync(user);
+
             
         }
     }

@@ -1,11 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookStore.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-[Authorize(Roles = "User")]
+[Authorize(Roles = "user")]
 public class WeatherForecastController : ControllerBase
 {
     private static readonly string[] Summaries = new[]
@@ -20,16 +21,17 @@ public class WeatherForecastController : ControllerBase
         _logger = logger;
     }
 
+  
     [HttpGet(Name = "GetWeatherForecast")]
-    public IEnumerable<WeatherForecast> Get()
-    {
-        return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+    public IActionResult Get(){
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)!.Value; // or use a custom claim key like "sub" if applicable
+
+        if (userIdClaim == null)
         {
-            Date = DateTime.Now.AddDays(index),
-            TemperatureC = Random.Shared.Next(-20, 55),
-            Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-        })
-        .ToArray();
+            return Unauthorized("User ID not found in the token.");
+        }
+        return Ok(userIdClaim);
     }
+
 }
 

@@ -22,7 +22,20 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
-builder.Services.AddControllers();
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+        options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
+    });
+
+builder.Services.AddControllers()
+    .AddNewtonsoftJson(options =>
+    {
+        options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+    });
+
 
 // registration firebase
 
@@ -35,6 +48,9 @@ FirebaseApp.Create(new AppOptions(){
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
+    c.OperationFilter<FormFileSwaggerFilter>();
+    
+
     c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "My API", Version = "v1" });
 
     // Define the OAuth2.0 scheme that's in use (JWT Bearer)
@@ -77,7 +93,23 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IBookRepository,BookRepository>();
 builder.Services.AddScoped<IBookService,BookService>();
+builder.Services.AddScoped<IBrandRepository, BrandRepository>();
 
+builder.Services.AddScoped<ICartItemRepository, CartItemRepository>();
+builder.Services.AddScoped<IOrderItemRepository, OrderItemRepository>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<ICartItemService,CartItemService>();
+
+builder.Services.AddScoped<IFeedBackRepository,FeedBackRepository>();
+builder.Services.AddScoped<IReviewService,ReviewService>();
+
+builder.Services.AddScoped<IBrandService,BrandService>();
+
+builder.Services.AddScoped<IVoucherRepository,VoucherRepository>();
+builder.Services.AddScoped<IVoucherUserRepository,VoucherUserRepository>();
+
+builder.Services.AddScoped<IVoucherService,VoucherService>();
 
 // sign up service Authentication and jwt 
 builder.Services.AddAuthentication(option => {
@@ -112,6 +144,7 @@ builder.Services.AddAuthentication(option => {
     };
 });
 
+builder.Services.AddHttpContextAccessor();
 
 
 var app = builder.Build();
@@ -124,7 +157,7 @@ if (app.Environment.IsDevelopment())
 }
 
 
-app.UseHttpsRedirection();
+
 
 
 app.UseAuthentication();

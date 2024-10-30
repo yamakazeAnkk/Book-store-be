@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BookStore.DTOs;
 using BookStore.Models;
 
 namespace BookStore.Repositories.Interfaces
@@ -12,13 +13,20 @@ namespace BookStore.Repositories.Interfaces
 
         Task<User> GetUserByNameAsync(string username);
 
-        Task<IEnumerable<User>> GetAllUserAsync();
+        Task<IEnumerable<User>> GetAllUserAsync(int page , int size);
 
         Task AddUserAsync(User user);
 
         Task<bool> SaveChangeAsync();
 
         Task<Role> GetRoleByNameAsync(string role);
+
+        Task<User> GetUserByEmailAsync(string email);
+
+        Task UpdateUserByAsync(User user);
+
+
+        
 
     }
 }

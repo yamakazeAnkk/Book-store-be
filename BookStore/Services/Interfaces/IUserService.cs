@@ -12,5 +12,15 @@ namespace BookStore.Services.Interfaces
         Task<User> RegisterUserAsync(UserDto userDto);
 
         Task<User> LoginUserAsync(LoginDto loginDto);
+
+        Task<User> GetUserByEmailAsync(string email);
+
+        Task<IEnumerable<UserDetailDto>> GetUserAllAsync(int page, int size);
+
+        Task UpdateUserAsync(int id, CreateUserDetailDto createUserDetailDto);
+
+        
+
+        
     }
 }

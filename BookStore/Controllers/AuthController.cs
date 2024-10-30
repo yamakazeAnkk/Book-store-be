@@ -7,6 +7,7 @@ using BookStore.Models;
 using BookStore.Services;
 using BookStore.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace BookStore.Controllers
 {
@@ -19,23 +20,69 @@ namespace BookStore.Controllers
 
         private readonly JwtService _jwtService;
 
-        public AuthController(IUserService userService, JwtService jwtService){
+        private readonly FirebaseStorageService _firebaseStorageService;
+
+        public AuthController(IUserService userService, JwtService jwtService,FirebaseStorageService firebaseStorageService){
             _userService = userService;
             _jwtService = jwtService;
+            _firebaseStorageService = firebaseStorageService;
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult> Register([FromBody] UserDto request){
+        public async Task<ActionResult> Register(
+            [FromForm] IFormFile imageFile, 
+            [FromForm(Name="UserJson")]string userJson)
+        {
+            // Validate the incoming UserDto
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            UserDto userDto;
+            userDto = JsonConvert.DeserializeObject<UserDto>(userJson);
+            // Check if required fields in UserDto are present
+            if (userDto == null || string.IsNullOrWhiteSpace(userDto.Username) ||
+                string.IsNullOrWhiteSpace(userDto.Email) || string.IsNullOrWhiteSpace(userDto.Password))
+            {
+                return BadRequest(new { message = "Username, Email, and Password are required." });
+            }
+
             try
             {
-                var user = await _userService.RegisterUserAsync(request);
-                return Ok(user);
+                // Handle the image upload if an image file is provided
+                if (imageFile != null && imageFile.Length > 0)
+                {
+                    // Validate that the uploaded file is an image
+                    if (!imageFile.ContentType.StartsWith("image/"))
+                    {
+                        return BadRequest("Only image files are allowed.");
+                    }
+
+                    // Generate a unique filename
+                    var fileName = Guid.NewGuid() + Path.GetExtension(imageFile.FileName);
+                    var contentType = imageFile.ContentType;
+
+                    // Upload the image file to your storage service
+                    using (var stream = imageFile.OpenReadStream())
+                    {
+                        var fileUrl = await _firebaseStorageService.UploadImageAsync(stream, fileName, contentType);
+
+                        // Set the ProfileImage URL in the UserDto
+                        userDto.ProfileImage = fileUrl;
+                    }
+                }
+
+                // Register the user using your user service
+                var registeredUser = await _userService.RegisterUserAsync(userDto);
+
+                return Ok(new { message = "User registered successfully", user = registeredUser });
             }
-            catch (ArgumentException ex)
+            catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return StatusCode(500, $"An error occurred: {ex.Message}");
             }
         }
+
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {

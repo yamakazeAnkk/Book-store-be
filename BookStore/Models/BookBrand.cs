@@ -3,13 +3,13 @@ using System.Collections.Generic;
 
 namespace BookStore.Models
 {
-    public partial class BookAuthor
+    public partial class BookBrand
     {
-        public int BookAuthorId { get; set; }
+        public int BookBrandId { get; set; }
         public int? BookId { get; set; }
-        public int? AuthorId { get; set; }
+        public int? BandId { get; set; }
 
-        public virtual Author? Author { get; set; }
+        public virtual Brand? Band { get; set; }
         public virtual Book? Book { get; set; }
     }
 }
