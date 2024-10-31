@@ -17,19 +17,28 @@ namespace BookStore.Controllers
     {
         private readonly IOrderService _orderService;
 
-        private readonly HttpContextAccessor _httpContextAccessor;
-        public OrdersController(IOrderService orderService, HttpContextAccessor httpContextAccessor){
+        
+        public OrdersController(IOrderService orderService){
             _orderService = orderService;
-            _httpContextAccessor = httpContextAccessor;
+            
         }
 
         [HttpGet("recent")]
         public async Task<IActionResult> GetRecentOrders(int page = 0, int size = 5)
         {
+            
+            var orders = await _orderService.GetOrdersRecentAsync(page, size);
+            return Ok(orders);
+        }
+        [HttpGet("user")]
+        public async Task<IActionResult> GetRecentOrdersByUser(int page = 0, int size = 5){
             var emailUser = User.FindFirst(ClaimTypes.Email)?.Value;
                 if (string.IsNullOrEmpty(emailUser))
                     return Unauthorized("User not authenticated");
-            var orders = await _orderService.GetOrdersRecentAsync(page, size);
+            var orders = await _orderService.GetOrdersRecentByUserAsync(emailUser, page, size);
+            if (orders == null || !orders.Any())
+                return NotFound(new { message = "No recent orders found for this user" });
+
             return Ok(orders);
         }
 
@@ -67,6 +76,20 @@ namespace BookStore.Controllers
             var order = await _orderService.GetOrderByIdAsync(id);
             if (order == null) return NotFound();
             return Ok(order);
+        }
+        [HttpGet("search-by-name")]
+        public async Task<IActionResult> SearchOrdersByName(string name, int page = 1, int size = 10)
+        {
+            var orders = await _orderService.SearchOrdersByNameAsync(name, page, size);
+            return Ok(orders);
+        }
+
+        
+        [HttpGet("search-by-date")]
+        public async Task<IActionResult> SearchOrdersByDate(int month, int year, int page = 1, int size = 10)
+        {
+            var orders = await _orderService.SearchOrdersByDateAsync(month, year, page, size);
+            return Ok(orders);
         }
     }
 }

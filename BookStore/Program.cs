@@ -111,6 +111,9 @@ builder.Services.AddScoped<IVoucherUserRepository,VoucherUserRepository>();
 
 builder.Services.AddScoped<IVoucherService,VoucherService>();
 
+builder.Services.AddScoped<IQuantityRepository,QuantityRepository>();
+builder.Services.AddScoped<IQuantityService,QuantityService>();
+
 // sign up service Authentication and jwt 
 builder.Services.AddAuthentication(option => {
     option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

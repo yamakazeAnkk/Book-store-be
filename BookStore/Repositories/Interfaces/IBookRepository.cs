@@ -21,7 +21,7 @@ namespace BookStore.Repositories.Interfaces
        
 
         Task<IEnumerable<Book>> SearchBooksByTitleAsync(string title, int page, int size);
-        Task<IEnumerable<Book>> FilterBooksByBrandAsync(int brandId, int page, int size);
+        Task<IEnumerable<Book>> FilterBooksByBrandAsync(List<int> brandIds, int page, int size);
         Task<IEnumerable<Book>> SortBooksByPriceAsync(decimal min, decimal max, int page, int size);
         
     }

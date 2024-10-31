@@ -25,27 +25,30 @@ namespace BookStore.Helper
             .ForMember(dest => dest.brandId, opt => opt.MapFrom(src => 
                 src.BookBrands.Select(bb => bb.BandId).Distinct().ToList())); // Sử dụng Distinct để loại bỏ trùng lặp
 
-            
-
-
-            CreateMap<Book,CreateBookDto>().ReverseMap();
+           
+            CreateMap<Book, BooksDto>()
+            .ForMember(dest => dest.BrandNames, opt => opt.MapFrom(src => 
+                src.BookBrands != null 
+                    ? src.BookBrands.Where(bb => bb.Band != null).Select(bb => bb.Band.Name).ToList() 
+                    : new List<string>())).ReverseMap(); // Trả về danh sách rỗng nếu `BookBrands` là null
 
             CreateMap<CartItem,CartItemDto>().ReverseMap();
 
 
             CreateMap<Book,BookDetailsDto>().ForMember(dest => dest.BrandNames, opt => opt.MapFrom(src => src.BookBrands.Select(bb => bb.Band != null ? bb.Band.Name : string.Empty).ToList())).ReverseMap();
+            
 
             CreateMap<CartItem,CartItemDto>()
                 .ForMember(dest =>dest.quantity , opt => opt.MapFrom(src => src.Quantity))
                 .ForMember(dest => dest.total, otp => otp.MapFrom(src => src.Quantity * src.Book.Price) )
                 .ForMember(dest => dest.bookDto , otp => otp.MapFrom(src => src.Book)).ReverseMap();
             
-            CreateMap<Order,OrderDto>().ForMember(dest => dest.OrderItems,opt => opt.MapFrom(src => src.OrderItems));
-            CreateMap<OrderItem,OrderItemDto>().ReverseMap();
+            CreateMap<Order,OrderDto>().ForMember(dest => dest.OrderItems,opt => opt.MapFrom(src => src.OrderItems)).ReverseMap();
+            CreateMap<OrderItem, OrderItemDto>().ForMember(dest => dest.BooksDto, opt => opt.MapFrom(src => src.Book)).ReverseMap();
             CreateMap<Order,CreateOrderDto>().ReverseMap();
             CreateMap<ProductCount, OrderItemDto>()
-            .ForMember(dest => dest.BookDto, opt => opt.MapFrom(src => src.Book)); 
-
+            .ForMember(dest => dest.BooksDto, opt => opt.MapFrom(src => src.Book)).ReverseMap(); 
+            CreateMap<Order,OrderDetailDto>();
             CreateMap<Review, ReviewDto>()
                 .ReverseMap(); 
 

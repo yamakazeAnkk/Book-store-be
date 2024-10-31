@@ -29,7 +29,7 @@ namespace BookStore.Services
             return await _brandRepository.AddBrandAsync(brand);
         }
 
-        public async Task DeleteBookAsync(int brandId)
+        public async Task DeleteBrandAsync(int brandId)
         {
             var brands = await _brandRepository.GetBrandByIdAsync(brandId);
             if(brands == null){
@@ -47,7 +47,7 @@ namespace BookStore.Services
 
         }
 
-        public async Task UpdateBookAsync(int id, CreateBrandDto createBrandDto)
+        public async Task UpdateBrandAsync(int id, CreateBrandDto createBrandDto)
         {
             var brands = await _brandRepository.GetBrandByIdAsync(id);
             if(brands == null){

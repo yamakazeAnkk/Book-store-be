@@ -101,10 +101,9 @@ namespace BookStore.Services
             .OrderByDescending(pc => pc.Count)
             .Take(amount)
             .Select(pc => new OrderItemDto {
-                BookId = (int)pc.BookId,
-                Count = pc.Count,
+                
                 Quantity = pc.Count, 
-                BookDto = _mapper.Map<BookDto>(pc.Book)
+                BooksDto = _mapper.Map<BooksDto>(pc.Book)
             }
 
             )
@@ -112,9 +111,10 @@ namespace BookStore.Services
             return bestSellerDto;
         }
 
-        public async Task<Order?> GetOrderByIdAsync(int id)
+        public async Task<OrderDto> GetOrderByIdAsync(int id)
         {
-            return await _orderRepository.GetOrderByIdAsync(id);
+            var order =  await _orderRepository.GetOrderByIdAsync(id);
+            return _mapper.Map<OrderDto>(order);
         }
 
         public async Task<IEnumerable<OrderItemDto>> GetOrderDetailsAsync(long orderId)
@@ -123,15 +123,38 @@ namespace BookStore.Services
             return _mapper.Map<IEnumerable<OrderItemDto>>(orderItems);
         }
 
-        public async Task<IEnumerable<OrderDto>> GetOrdersRecentAsync(int pageNumber, int sizeNumber)
+        public async Task<IEnumerable<OrderDetailDto>> GetOrdersRecentAsync(int pageNumber, int sizeNumber)
         {
             var orders = await _orderRepository.GetRecentOrdersAsync(pageNumber,sizeNumber);
-            return _mapper.Map<IEnumerable<OrderDto>>(orders);
+            return _mapper.Map<IEnumerable<OrderDetailDto>>(orders);
+        }
+
+
+        public async Task<IEnumerable<OrderDetailDto>> GetOrdersRecentByUserAsync(string emailUser, int page, int size)
+        {
+            var user = await _userRepository.GetUserByEmailAsync(emailUser);
+            if(user == null){
+                throw new Exception("User not found");
+            }
+            var orders = await _orderRepository.GetRecentOrdersByUserIdAsync(user.UserId,page,size);
+            return _mapper.Map<IEnumerable<OrderDetailDto>>(orders);
         }
 
         public async Task<double> GetTotalRevenueAsync()
         {
             return await _orderRepository.GetTotalRevenueAsync();
         }
+        public async Task<IEnumerable<OrderDetailDto>> SearchOrdersByNameAsync(string name, int page, int size)
+        {
+            var orders = await _orderRepository.SearchOrdersByNameAsync(name, page, size);
+            return _mapper.Map<IEnumerable<OrderDetailDto>>(orders);
+        }
+
+        public async Task<IEnumerable<OrderDetailDto>> SearchOrdersByDateAsync(int month, int year, int page, int size)
+        {
+            var orders = await _orderRepository.SearchOrdersByDateAsync(month, year, page, size);
+            return _mapper.Map<IEnumerable<OrderDetailDto>>(orders);
+        }
+
     }
 }

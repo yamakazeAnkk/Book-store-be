@@ -24,6 +24,7 @@ namespace BookStore.Controllers
             _firebaseStorageService = firebaseStorageService;
             _bookService = bookService;
         }
+        
         // Phân trang
         [Authorize(Roles = "user")]
         [HttpGet]
@@ -38,7 +39,7 @@ namespace BookStore.Controllers
             return Ok(pagedBooks);
         }
         [HttpGet("brand")]
-        public async Task<IActionResult> SearchBooksByBrand(int id ,int pageNumber=  1 ,int pageSize =10 ){
+        public async Task<IActionResult> SearchBooksByBrand([FromQuery]List<int> id ,int pageNumber=  1 ,int pageSize =10 ){
             var pagedBooks = await _bookService.FilterBooksByBrandAsync(id,pageNumber,pageSize);
             return Ok(pagedBooks);
         }

@@ -10,12 +10,16 @@ namespace BookStore.Services.Interfaces
     public interface IOrderService
     {
         Task<double> GetTotalRevenueAsync();
-        Task<IEnumerable<OrderDto>> GetOrdersRecentAsync(int page, int size);
+        Task<IEnumerable<OrderDetailDto>> GetOrdersRecentAsync(int page, int size);
+        Task<IEnumerable<OrderDetailDto>> GetOrdersRecentByUserAsync(string emailUser,int page, int size);
         Task<IEnumerable<OrderItemDto>> GetOrderDetailsAsync(long orderId);
         Task CheckoutAsync(CreateOrderDto createOrderDto, string userName);
-        Task<Order?> GetOrderByIdAsync(int id);
+        Task<OrderDto> GetOrderByIdAsync(int id);
         Task<IEnumerable<OrderItemDto>> GetBestSellersAsync(int amount);
 
+        Task<IEnumerable<OrderDetailDto>> SearchOrdersByNameAsync(string name, int page, int size);
+
+        Task<IEnumerable<OrderDetailDto>> SearchOrdersByDateAsync(int month, int year, int page, int size);
         
     }
 }

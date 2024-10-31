@@ -15,7 +15,7 @@ namespace BookStore.Services.Interfaces
         Task UpdateBookAsync(int id,BookDto bookDto);
         Task DeleteBookAsync(int bookId);
         Task<IEnumerable<BookDto>> SearchBooksByTitleAsync(string title, int page, int size);
-        Task<IEnumerable<BookDto>> FilterBooksByBrandAsync(int brandId, int page, int size);
+        Task<IEnumerable<BookDto>> FilterBooksByBrandAsync(List<int> brandIds, int page, int size);
         Task<IEnumerable<BookDto>> SortBooksByPriceAsync(decimal min, decimal max, int page, int size);
 
         

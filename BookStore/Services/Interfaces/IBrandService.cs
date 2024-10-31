@@ -13,7 +13,7 @@ namespace BookStore.Services.Interfaces
 
         Task<Brand> AddBrandAsync(CreateBrandDto createBrandDto);
 
-        Task UpdateBookAsync(int id,CreateBrandDto createBrandDto);
-        Task DeleteBookAsync(int brandId);
+        Task UpdateBrandAsync(int id,CreateBrandDto createBrandDto);
+        Task DeleteBrandAsync(int brandId);
     }
 }

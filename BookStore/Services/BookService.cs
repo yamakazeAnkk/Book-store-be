@@ -15,7 +15,6 @@ namespace BookStore.Services
     public class BookService : IBookService
     {
 
-        
         private readonly IBookRepository _bookRepository;
         private readonly IMapper _mapper;
         private readonly FirebaseStorageService _firebaseStorageService;
@@ -64,7 +63,7 @@ namespace BookStore.Services
             await _bookRepository.DeleteBookAsync(bookId);
         }
 
-        public async Task<IEnumerable<BookDto>> FilterBooksByBrandAsync(int brandId, int page, int size)
+        public async Task<IEnumerable<BookDto>> FilterBooksByBrandAsync(List<int> brandId, int page, int size)
         {
             var books = await _bookRepository.FilterBooksByBrandAsync(brandId,page,size);
             return _mapper.Map<IEnumerable<BookDto>>(books);

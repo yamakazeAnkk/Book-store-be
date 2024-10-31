@@ -49,13 +49,16 @@ namespace BookStore.Repositories
             }
         }
 
-        public async Task<IEnumerable<Book>> FilterBooksByBrandAsync(int brandId, int page, int size)
+        public async Task<IEnumerable<Book>> FilterBooksByBrandAsync(List<int> brandIds, int page, int size)
         {
             return await _bookStoreContext.BookBrands
-                .Where(bb => bb.BandId == brandId)
+                .Where(bb => brandIds.Contains(bb.BandId.GetValueOrDefault()))
                 .Include(bb => bb.Book)
-                .Select(bb => bb.Book)
-                .Skip((page-1) * size)
+                .ThenInclude(b => b.BookBrands)
+                .ThenInclude(bb => bb.Band)
+                .GroupBy(bb => bb.Book.BookId) // Nhóm theo `BookId` để loại bỏ trùng lặp
+                .Select(g => g.First().Book)   // Lấy `Book` đầu tiên từ mỗi nhóm
+                .Skip((page - 1) * size)
                 .Take(size)
                 .ToListAsync();
         }
