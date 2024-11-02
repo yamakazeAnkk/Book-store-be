@@ -73,17 +73,27 @@ namespace BookStore.Services
                 order.OrderItems.Add(orderItems);
                 totalAmount += book.Price * cartItem.Quantity;
             }
-            
-            var voucherUser = await _voucherUserRepository.GetUnusedVoucherByUserIdAsync(currentUser.UserId);
-            if(voucherUser != null && voucherUser.IsUsed > 0){
-                var voucher = await _voucherRepository.GetVoucherByIdAsync(voucherUser.VoucherId);
-                if (voucher.ExpiredDate >= DateTime.UtcNow && totalAmount >= voucher.MinCost)
+            if (!string.IsNullOrWhiteSpace(createOrderDto.Code))
+            {
+                var voucher = await _voucherRepository.GetVoucherByCodeAsync(createOrderDto.Code);
+                if (voucher != null && voucher.ExpiredDate >= DateTime.UtcNow && totalAmount >= voucher.MinCost)
                 {
-                    decimal discount = Math.Min(voucher.Discount, totalAmount);
-                    totalAmount -= discount;
-                    
-                    voucherUser.IsUsed -= 1;
-                    await _voucherUserRepository.UpdateVoucherUserAsync(voucherUser);
+                    var voucherUser = await _voucherUserRepository.GetVoucherByUserIdAndVoucherIdAsync(currentUser.UserId, voucher.VoucherId);
+                    if (voucherUser != null && voucherUser.IsUsed != 0)
+                    {
+                        decimal discount = Math.Min(voucher.Discount, totalAmount);
+                        totalAmount -= discount;
+                        voucherUser.IsUsed = 0; 
+                        await _voucherUserRepository.UpdateVoucherUserAsync(voucherUser);
+                    }
+                    else
+                    {
+                        throw new Exception("Voucher is already used or invalid for this user.");
+                    }
+                }
+                else
+                {
+                    throw new Exception("Invalid or expired voucher code.");
                 }
             }
             order.TotalAmount = totalAmount;

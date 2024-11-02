@@ -54,7 +54,7 @@ namespace BookStore.Services
                 IsUsed = 1 
             };
             
-            voucher.MinCost = Math.Max(0, voucher.MinCost - 1);
+            voucher.Quantity = (byte?)Math.Max(0, voucher.Quantity.GetValueOrDefault() - 1);
             await _voucherUserRepository.AddVoucherCodeAsync(voucherUser);
         }
 

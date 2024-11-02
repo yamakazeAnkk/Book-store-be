@@ -22,6 +22,8 @@ namespace BookStore.DTOs
 
         public string? Description { get; set; }
 
+        public string? Ebook { get ; set; }
+
         public string? Image { get; set; }
 
         [JsonProperty("author_name")]
