@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using BookStore.Helper;
 using BookStore.Models;
@@ -79,7 +80,10 @@ namespace BookStore.Repositories
             return await _bookStoreContext.Books.Include(u => u.BookBrands).ThenInclude(x=> x.Band).FirstOrDefaultAsync(b => b.BookId == bookId);
         }
 
-    
+        public async Task<IEnumerable<Book>> GetBooksAsync(Expression<Func<Book, bool>> predicate)
+        {
+            return await _bookStoreContext.Books.Where(predicate).ToListAsync();
+        }
 
         public async Task<PaginatedResult<Book>> GetBooksPagedAsync(int pageNumber, int pageSize)
         {

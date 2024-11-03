@@ -10,6 +10,7 @@ using BookStore.Models;
 using BookStore.Repositories;
 using BookStore.Repositories.Interfaces;
 using BookStore.Services.Interfaces;
+using Microsoft.AspNetCore.SignalR;
 
 namespace BookStore.Services
 {
@@ -23,12 +24,15 @@ namespace BookStore.Services
         private readonly IFileUploadService _fileUploadService;
         private readonly IBrandRepository _brandRepository;
 
-        public BookService(IFileUploadService fileUploadService, IBookRepository bookRepository, IMapper mapper, FirebaseStorageService firebaseStorageService,IBrandRepository brandRepository){
+        private readonly IHubContext<NotificationHub> _hubContext;
+
+        public BookService(IHubContext<NotificationHub> hubContext,IFileUploadService fileUploadService, IBookRepository bookRepository, IMapper mapper, FirebaseStorageService firebaseStorageService,IBrandRepository brandRepository){
             _bookRepository = bookRepository;
             _mapper = mapper;
             _firebaseStorageService = firebaseStorageService;
             _brandRepository = brandRepository;
             _fileUploadService = fileUploadService;
+            _hubContext = hubContext;
        
         }
        public async Task<Book> AddBookAsync(CreateBookDto bookDto, UploadFilesDto filesDto)
@@ -151,6 +155,16 @@ namespace BookStore.Services
             _mapper.Map(bookDto,book);
 
             await _bookRepository.UpdateBookAsync(book);
+        }
+        public async Task CheckBookQuantityAndNotifyAsync()
+        {
+            var lowStockBooks = await _bookRepository.GetBooksAsync(b => b.Quantity < 10);
+
+            foreach (var book in lowStockBooks)
+            {
+                
+                await _hubContext.Clients.All.SendAsync("NotifyLowStock", $"The book '{book.Title}' has less than 10 items in stock.");
+            }
         }
     }
 }

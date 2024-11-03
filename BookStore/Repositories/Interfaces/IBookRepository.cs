@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using BookStore.Helper;
 using BookStore.Models;
@@ -19,6 +20,8 @@ namespace BookStore.Repositories.Interfaces
 
         Task DeleteBookAsync (int id);
         Task AddBookBrandAsync(List<BookBrand> bookBrand);
+
+        Task<IEnumerable<Book>> GetBooksAsync(Expression<Func<Book, bool>> predicate);
 
         
        
