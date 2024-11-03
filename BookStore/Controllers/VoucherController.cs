@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using BookStore.DTOs;
 using BookStore.Services.Interfaces;
@@ -61,10 +62,30 @@ namespace BookStore.Controllers
                 return StatusCode(500, new { message = ex.Message });
             }
         }
-        [HttpGet]
+        [HttpGet("amdin")]
         public async Task<IActionResult> GetAllVoucher(){
             var voucher = await _voucherService.GetAllVouchersAsync();
             return Ok(voucher);
+        }
+        [HttpGet("user")]
+        public async Task<IActionResult> GetAllVoucherByUser(){
+            var emailUser = User.FindFirst(ClaimTypes.Email)?.Value;
+
+            if (string.IsNullOrEmpty(emailUser))
+            {
+                return Unauthorized("User not authenticated");
+            }
+
+            try
+            {
+                var vouchers = await _voucherService.GetAllVouchersByUserAsync(emailUser);
+                return Ok(vouchers);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
+          
         }
     }
 }

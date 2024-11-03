@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BookStore.Helper;
 using BookStore.Models;
 using BookStore.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -49,9 +50,14 @@ namespace BookStore.Repositories
             }
         }
 
-        public async Task<IEnumerable<Book>> FilterBooksByBrandAsync(List<int> brandIds, int page, int size)
+        public async Task<PaginatedResult<Book>> FilterBooksByBrandAsync(List<int> brandIds, int page, int size)
         {
-            return await _bookStoreContext.BookBrands
+            int totalCount = await _bookStoreContext.BookBrands
+            .Where(bb => brandIds.Contains(bb.BandId.GetValueOrDefault()))
+            .Select(bb => bb.Book.BookId)
+            .Distinct()
+            .CountAsync();
+            var books=  await _bookStoreContext.BookBrands
                 .Where(bb => brandIds.Contains(bb.BandId.GetValueOrDefault()))
                 .Include(bb => bb.Book)
                 .ThenInclude(b => b.BookBrands)
@@ -61,6 +67,7 @@ namespace BookStore.Repositories
                 .Skip((page - 1) * size)
                 .Take(size)
                 .ToListAsync();
+            return new PaginatedResult<Book>(books,totalCount,size);
         }
 
         public async Task<Book> GetBookByIdAsync(int? bookId)
@@ -74,35 +81,48 @@ namespace BookStore.Repositories
 
     
 
-        public async Task<IEnumerable<Book>> GetBooksPagedAsync(int pageNumber, int pageSize)
+        public async Task<PaginatedResult<Book>> GetBooksPagedAsync(int pageNumber, int pageSize)
         {
-            return await _bookStoreContext.Books
+            int totalCount = await _bookStoreContext.Books.CountAsync();
+            var books = await _bookStoreContext.Books
                 .Include(u => u.BookBrands)
                 .ThenInclude(x => x.Band)
                 .OrderBy(b => b.Title) // Sắp xếp theo tiêu đề
                 .Skip((pageNumber - 1) * pageSize) // Bỏ qua các trang trước đó
                 .Take(pageSize) // Lấy số lượng bản ghi cho trang hiện tại
                 .ToListAsync();
+            return new PaginatedResult<Book>(books, totalCount, pageSize);
         }
 
-        public async Task<IEnumerable<Book>> SearchBooksByTitleAsync(string searchTerm, int page, int size)
+        public async Task<PaginatedResult<Book>> SearchBooksByTitleAsync(string searchTerm, int page, int size)
         {
-            return await _bookStoreContext.Books
-                .Where(b => EF.Functions.Like(b.Title,$"%{searchTerm}%") || EF.Functions.Like(b.AuthorName,$"%{searchTerm}%") )
-                .Skip((page-1) * size)
+            int totalCount = await _bookStoreContext.Books
+                .CountAsync(b => EF.Functions.Like(b.Title, $"%{searchTerm}%") || EF.Functions.Like(b.AuthorName, $"%{searchTerm}%"));
+
+            var books = await _bookStoreContext.Books
+                .Where(b => EF.Functions.Like(b.Title, $"%{searchTerm}%") || EF.Functions.Like(b.AuthorName, $"%{searchTerm}%"))
+                .OrderBy(b => b.Title)
+                .Skip((page - 1) * size)
                 .Take(size)
                 .ToListAsync();
+
+            return new PaginatedResult<Book>(books, totalCount, size);
             
         }
 
-        public async Task<IEnumerable<Book>> SortBooksByPriceAsync(decimal min, decimal max, int page, int size)
+        public async Task<PaginatedResult<Book>> SortBooksByPriceAsync(decimal min, decimal max, int page, int size)
         {
-            return await _bookStoreContext.Books
-            .Where(b => b.Price >= min && b.Price <= max) // Filter by price range
-            .OrderBy(b => b.Price) // Sort by price in ascending order
-            .Skip((page - 1) * size) // Pagination
-            .Take(size)
-            .ToListAsync();
+            int totalCount = await _bookStoreContext.Books
+                .CountAsync(b => b.Price >= min && b.Price <= max);
+
+            var books = await _bookStoreContext.Books
+                .Where(b => b.Price >= min && b.Price <= max)
+                .OrderBy(b => b.Price)
+                .Skip((page - 1) * size)
+                .Take(size)
+                .ToListAsync();
+
+            return new PaginatedResult<Book>(books, totalCount, size);
         }
 
         public async Task UpdateBookAsync(Book book)

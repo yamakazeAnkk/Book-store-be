@@ -8,7 +8,7 @@ namespace BookStore.Repositories.Interfaces
 {
     public interface IVoucherUserRepository
     {
-        Task<VoucherUser> GetVoucherByUserIdAndVoucherIdAsync(int userId, int voucherId);
+        Task<VoucherUser> GetVoucherByUserAndVoucherIdAsync(int userId, int voucherId);
         Task UpdateVoucherUserAsync(VoucherUser voucherUser);
 
         Task AddVoucherCodeAsync(VoucherUser voucherUser);

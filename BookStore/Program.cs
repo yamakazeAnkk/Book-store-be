@@ -114,6 +114,8 @@ builder.Services.AddScoped<IVoucherService,VoucherService>();
 builder.Services.AddScoped<IQuantityRepository,QuantityRepository>();
 builder.Services.AddScoped<IQuantityService,QuantityService>();
 
+builder.Services.AddScoped<IFileUploadService,FileUploadService>();
+
 // sign up service Authentication and jwt 
 builder.Services.AddAuthentication(option => {
     option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -148,7 +150,10 @@ builder.Services.AddAuthentication(option => {
 });
 
 builder.Services.AddHttpContextAccessor();
-
+builder.Services.AddCors(p => p.AddPolicy("MyCors", build =>
+{
+    build.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+}));
 
 var app = builder.Build();
 
@@ -161,7 +166,7 @@ if (app.Environment.IsDevelopment())
 
 
 
-
+app.UseCors("MyCors");
 
 app.UseAuthentication();
 app.UseAuthorization();

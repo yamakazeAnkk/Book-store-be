@@ -47,7 +47,10 @@ namespace BookStore.Repositories
             return await _context.Vouchers.FindAsync(voucherId);
         }
 
-        
+        public async Task<IEnumerable<Voucher>> GetVouchersByUserIdAsync(int userId)
+        {
+           return await _context.VoucherUsers.Where(u => u.UserId == userId).Include(u => u.Voucher).Select(u => u.Voucher).ToListAsync();
+        }
 
         public async Task UpdateVoucherAsync(Voucher voucher)
         {
@@ -55,4 +58,4 @@ namespace BookStore.Repositories
             await _context.SaveChangesAsync();
         }
     }
-}
+} 

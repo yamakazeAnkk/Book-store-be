@@ -14,14 +14,17 @@ namespace BookStore.Services
     {
         private readonly IVoucherRepository _voucherRepository;
 
+        private readonly IUserRepository _userRepository;
+
         private readonly IMapper _mapper;
 
         private readonly IVoucherUserRepository _voucherUserRepository;
 
-        public VoucherService(IVoucherUserRepository voucherUserRepository,IMapper mapper,IVoucherRepository voucherRepository){
+        public VoucherService(IUserRepository userRepository,IVoucherUserRepository voucherUserRepository,IMapper mapper,IVoucherRepository voucherRepository){
             _voucherRepository = voucherRepository;
             _voucherUserRepository = voucherUserRepository;
             _mapper = mapper;
+            _userRepository = userRepository;
         }
         private string GenerateRandomVoucherCode()
         {
@@ -42,7 +45,7 @@ namespace BookStore.Services
             }
 
            
-            var existingVoucherUser = await _voucherUserRepository.GetVoucherByUserIdAndVoucherIdAsync(userId, voucher.VoucherId);
+            var existingVoucherUser = await _voucherUserRepository.GetVoucherByUserAndVoucherIdAsync(userId, voucher.VoucherId);
             if (existingVoucherUser != null)
             {
                 throw new Exception("Bạn đã nhận voucher này rồi.");
@@ -58,7 +61,7 @@ namespace BookStore.Services
             await _voucherUserRepository.AddVoucherCodeAsync(voucherUser);
         }
 
-        public async Task<Voucher> AddVoucherAsync(CreateVoucherDto createVoucherDto)
+        public async Task AddVoucherAsync(CreateVoucherDto createVoucherDto)
         {
             var voucherCode = GenerateRandomVoucherCode();
 
@@ -73,30 +76,33 @@ namespace BookStore.Services
             };
 
             await _voucherRepository.AddVoucherAsync(voucher);
-            return voucher;
+            
         }
 
-        public async Task<Voucher> UpdateVoucherAsync(int voucherId, CreateVoucherDto createVoucherDto)
+        public async Task UpdateVoucherAsync(int voucherId, CreateVoucherDto createVoucherDto)
         {
-            var voucher = await GetVoucherByIdAsync(voucherId);
+            var voucher = await _voucherRepository.GetVoucherByIdAsync(voucherId);
             if (voucher == null){
                 throw new Exception("Voucher không tồn tại.");
             }
             _mapper.Map(createVoucherDto,voucher);
+            
             await _voucherRepository.UpdateVoucherAsync(voucher);
-            return voucher;
+            
 
         }
 
-        public async Task<Voucher> GetVoucherByIdAsync(int voucherId)
+        public async Task<VoucherDto> GetVoucherByIdAsync(int voucherId)
         {
-            return await _voucherRepository.GetVoucherByIdAsync(voucherId)
+            var voucher = await _voucherRepository.GetVoucherByIdAsync(voucherId)
                    ?? throw new Exception("Voucher không tồn tại.");
+            return _mapper.Map<VoucherDto>(voucher);
         }
 
-        public async Task<IEnumerable<Voucher>> GetAllVouchersAsync()
+        public async Task<IEnumerable<VoucherDto>> GetAllVouchersAsync()
         {
-            return await _voucherRepository.GetAllVoucherAsync();
+            var voucher =  await _voucherRepository.GetAllVoucherAsync();
+            return _mapper.Map<IEnumerable<VoucherDto>>(voucher);
         }
 
         public async Task DeleteVoucherAsync(int voucherId)
@@ -108,6 +114,17 @@ namespace BookStore.Services
             await _voucherRepository.DeleteVoucherAsync(voucherId);
         }
 
-        
+        public async Task<IEnumerable<VoucherDto>> GetAllVouchersByUserAsync(string username)
+        {
+            var user = await _userRepository.GetUserByEmailAsync(username);
+            if(user == null){
+                throw new Exception("User không tồn tại.");
+            }
+            var voucher = await _voucherRepository.GetVouchersByUserIdAsync(user.UserId);
+            return _mapper.Map<IEnumerable<VoucherDto>>(voucher);
+            
+        }
+
+      
     }
 }

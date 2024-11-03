@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BookStore.DTOs;
+using BookStore.Helper;
 using BookStore.Models;
 
 namespace BookStore.Repositories.Interfaces
@@ -13,7 +14,7 @@ namespace BookStore.Repositories.Interfaces
 
         Task<User> GetUserByNameAsync(string username);
 
-        Task<IEnumerable<User>> GetAllUserAsync(int page , int size);
+        Task<PaginatedResult<User>> GetAllUserAsync(int page , int size);
 
         Task AddUserAsync(User user);
 

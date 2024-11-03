@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -24,30 +25,62 @@ namespace BookStore.Controllers
         }
 
         [HttpGet("recent")]
-        public async Task<IActionResult> GetRecentOrders(int page = 0, int size = 5)
+        public async Task<IActionResult> GetRecentOrders(int page = 1, int size = 10)
         {
             
             var orders = await _orderService.GetOrdersRecentAsync(page, size);
             return Ok(orders);
         }
         [HttpGet("user")]
-        public async Task<IActionResult> GetRecentOrdersByUser(int page = 0, int size = 5){
+        public async Task<IActionResult> GetRecentOrdersByUser(int page = 1, int size = 10){
             var emailUser = User.FindFirst(ClaimTypes.Email)?.Value;
                 if (string.IsNullOrEmpty(emailUser))
                     return Unauthorized("User not authenticated");
             var orders = await _orderService.GetOrdersRecentByUserAsync(emailUser, page, size);
-            if (orders == null || !orders.Any())
+            if (orders == null || !orders.Items.Any())
                 return NotFound(new { message = "No recent orders found for this user" });
 
             return Ok(orders);
         }
 
         [HttpGet("best-sellers")]
-        public async Task<IActionResult> GetBestSellers([FromQuery] int amount = 0)
+        public async Task<IActionResult> GetBestSellers(int amount = 10)
         {
             var bestSellers = await _orderService.GetBestSellersAsync(amount);
             return Ok(bestSellers);
         }
+        [HttpPut("update-status")]
+        public async Task<IActionResult> UpdateStatus(int id,string status){
+            try
+            {
+             
+                await _orderService.UpdateStateAsync(id,status);
+
+                return Ok(new { message = "Status update successfully." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
+        [HttpPut("cancel-status")]
+        public async Task<IActionResult> CancelOrder(int id){
+            try
+            {
+                var emailUser = User.FindFirst(ClaimTypes.Email)?.Value;
+                if (string.IsNullOrEmpty(emailUser))
+                    return Unauthorized("User not authenticated");
+                await _orderService.UpdateStateAsync(id,emailUser);
+
+                return Ok(new { message = "Status update successfully." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
+        
+        
 
         [HttpPost("checkout")]
         public async Task<IActionResult> Checkout([FromBody] CreateOrderDto createOrderDto)
@@ -85,11 +118,17 @@ namespace BookStore.Controllers
         }
 
         
+        
         [HttpGet("search-by-date")]
         public async Task<IActionResult> SearchOrdersByDate(int month, int year, int page = 1, int size = 10)
         {
             var orders = await _orderService.SearchOrdersByDateAsync(month, year, page, size);
             return Ok(orders);
+        }
+        [HttpGet("filter-status")]
+        public async Task<IActionResult> FilterStatus(string status,int page = 1, int size = 10){
+            var order = await _orderService.FilterOrderByStateAsync(status,page,size);
+            return Ok(order);
         }
     }
 }

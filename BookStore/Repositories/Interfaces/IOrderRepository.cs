@@ -2,21 +2,33 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BookStore.Helper;
 using BookStore.Models;
+using Google.Api.Gax;
 
 namespace BookStore.Repositories.Interfaces
 {
     public interface IOrderRepository
     {
         Task<double> GetTotalRevenueAsync();
-        Task<IEnumerable<Order>> FindAllByUserAsync(int userId);
+        Task<PaginatedResult<Order>> FindAllByUserAsync(int userId,int page ,int size);
         Task<Order> GetOrderByIdAsync(int orderId);
-        Task<IEnumerable<Order>> GetRecentOrdersAsync(int page, int size);
+        Task<PaginatedResult<Order>> GetRecentOrdersAsync(int page, int size);
         Task AddOrderAsync(Order order);
 
-        Task<IEnumerable<Order>> SearchOrdersByNameAsync(string name,int page, int size);
-        Task<IEnumerable<Order>> SearchOrdersByDateAsync(int month, int year,int page, int size);
+        Task UpdateOrderAsync(Order order);
 
-        Task<IEnumerable<Order>> GetRecentOrdersByUserIdAsync(int userId, int page, int size);
+        Task<decimal>GetTotalRevenueByQuarterAsync(int year ,int quarter);
+
+        Task<decimal> GetTotalRevenueByYearAsync(int year);
+
+        Task DeleteOrderByIdAsync(int id );
+        Task <PaginatedResult<Order>>FilterOrderByStateAsync(string state, int page ,int size );
+
+        Task<PaginatedResult<Order>> SearchOrdersByNameAsync(string name,int page, int size);
+        Task<PaginatedResult<Order>> SearchOrdersByDateAsync(int month, int year,int page, int size);
+
+        Task<PaginatedResult<Order>> GetRecentOrdersByUserIdAsync(int userId, int page, int size);
+        
     }
 }

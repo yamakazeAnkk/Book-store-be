@@ -12,10 +12,11 @@ namespace BookStore.Services.Interfaces
     {
         Task ClaimVoucherAsync(int userId, string voucherCode);
 
-        Task<Voucher> AddVoucherAsync(CreateVoucherDto createVoucherDto); 
-        Task<Voucher> UpdateVoucherAsync(int voucherId, CreateVoucherDto createVoucherDto); 
-        Task<Voucher> GetVoucherByIdAsync(int voucherId); 
-        Task<IEnumerable<Voucher>> GetAllVouchersAsync(); 
+        Task AddVoucherAsync(CreateVoucherDto createVoucherDto); 
+        Task UpdateVoucherAsync(int voucherId, CreateVoucherDto createVoucherDto); 
+        Task<VoucherDto> GetVoucherByIdAsync(int voucherId); 
+        Task<IEnumerable<VoucherDto>> GetAllVouchersAsync();
+        Task<IEnumerable<VoucherDto>> GetAllVouchersByUserAsync(string username);
         Task DeleteVoucherAsync(int voucherId); 
 
 

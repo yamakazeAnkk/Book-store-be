@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using BookStore.DTOs;
+using BookStore.Helper;
 using BookStore.Models;
 
 namespace BookStore.Helper
@@ -34,7 +35,7 @@ namespace BookStore.Helper
 
             CreateMap<CartItem,CartItemDto>().ReverseMap();
 
-
+            CreateMap<Book,CreateBookDto>().ReverseMap();
             CreateMap<Book,BookDetailsDto>().ForMember(dest => dest.BrandNames, opt => opt.MapFrom(src => src.BookBrands.Select(bb => bb.Band != null ? bb.Band.Name : string.Empty).ToList())).ReverseMap();
             
 
@@ -70,7 +71,21 @@ namespace BookStore.Helper
 
             CreateMap<CreateVoucherDto,Voucher>().ReverseMap();
             CreateMap<VoucherDetailDto,Voucher>().ReverseMap();
+            CreateMap<VoucherDto,Voucher>().ReverseMap();
+
+            CreateMap<Order,OrderStatusDto>().ReverseMap();
+
+            CreateMap(typeof(PaginatedResult<>), typeof(PaginatedResult<>))
+            .ConvertUsing(typeof(PaginatedResultConverter<,>));
 
         }       
+    }
+    public class PaginatedResultConverter<TSource, TDestination> : ITypeConverter<PaginatedResult<TSource>, PaginatedResult<TDestination>>
+    {
+        public PaginatedResult<TDestination> Convert(PaginatedResult<TSource> source, PaginatedResult<TDestination> destination, ResolutionContext context)
+        {
+            var mappedItems = context.Mapper.Map<IEnumerable<TDestination>>(source.Items);
+            return new PaginatedResult<TDestination>(mappedItems, source.TotalCount, source.TotalCount / mappedItems.Count());
+        }
     }
 }

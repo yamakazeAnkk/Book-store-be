@@ -63,56 +63,28 @@ namespace BookStore.Controllers
         }
 
       
+        
         [HttpPost("create")]
-        public async Task<IActionResult> AddBookWithImage(
-            [FromForm] IFormFile imageFile,   
-            [FromForm(Name = "BookJson")] string bookJson)     
+      
+        public async Task<IActionResult> AddBook(
+            [FromForm] CreateBookDto bookDto,
+            [FromForm] UploadFilesDto filesDto)
         {
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState); 
-            }
-
           
-            if (imageFile == null || imageFile.Length == 0)
+            if (bookDto == null || string.IsNullOrWhiteSpace(bookDto.Title) || bookDto.brandId == null || !bookDto.brandId.Any())
             {
-                return BadRequest("Please select an image file.");
+                return BadRequest(new { message = "Invalid data for BookDto", errors = new List<string> { "Title and BrandId are required" } });
             }
-                BookDto bookDto;
-                try
-                {
-                    bookDto = JsonConvert.DeserializeObject<BookDto>(bookJson);
-                }
-                catch (Exception ex)
-                {
-                    return BadRequest(new { message = "Invalid JSON format for BookDto", error = ex.Message });
-                }
 
-               
-                if (bookDto == null || string.IsNullOrWhiteSpace(bookDto.Title) || bookDto.brandId == null || !bookDto.brandId.Any())
-                {
-                    return BadRequest(new { message = "Invalid data for BookDto", errors = new List<string> { "Title and brandId are required" } });
-                }
             try
             {
-              
-                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
-                var contentType = imageFile.ContentType;
-
-                using (var stream = imageFile.OpenReadStream())
-                {
-                  
-                    var fileUrl = await _firebaseStorageService.UploadImageAsync(stream, fileName, contentType);
-
-                  
-                   bookDto.Image = fileUrl; 
-                }
-
-      
-                var createdBook = await _bookService.AddBookAsync(bookDto);
-
-                return Ok(new { message = "Book created successfully", book = createdBook });
+         
+                var createdBook = await _bookService.AddBookAsync(bookDto, filesDto);
+                return CreatedAtAction(nameof(GetBookById), new { id = createdBook.BookId }, createdBook);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
             }
             catch (Exception ex)
             {
@@ -128,61 +100,19 @@ namespace BookStore.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateBook(
             int id,
-            [FromForm] IFormFile imageFile,
-            [FromForm(Name = "BookJson")] string bookJson)
+            [FromForm] UploadFilesDto files,
+            [FromForm] CreateBookDto bookDto)
         {
-            // Validate input data
-            if (string.IsNullOrWhiteSpace(bookJson))
-            {
-                return BadRequest("Invalid BookJson data.");
-            }
-
-            BookDto bookDto;
-            try
-            {
-                // Deserialize the JSON string into a BookDto object
-                bookDto = JsonConvert.DeserializeObject<BookDto>(bookJson);
-            }
-            catch (JsonException ex)
-            {
-                return BadRequest(new { message = "Invalid JSON format for BookDto", error = ex.Message });
-            }
-
-            // Validate required fields in BookDto
+          
             if (bookDto == null || string.IsNullOrWhiteSpace(bookDto.Title) || bookDto.brandId == null || !bookDto.brandId.Any())
             {
                 return BadRequest(new { message = "Invalid data for BookDto", errors = new List<string> { "Title and BrandId are required" } });
             }
 
-            try
+           try
             {
-                // Handle the image file upload if a new image is provided
-                if (imageFile != null && imageFile.Length > 0)
-                {
-                    // Check if the uploaded file is an image
-                    if (!imageFile.ContentType.StartsWith("image/"))
-                    {
-                        return BadRequest("Only image files are allowed.");
-                    }
-
-                    // Generate a unique filename
-                    var fileName = Guid.NewGuid() + Path.GetExtension(imageFile.FileName);
-                    var contentType = imageFile.ContentType;
-
-                    // Upload the image to Firebase or your preferred storage service
-                    using (var stream = imageFile.OpenReadStream())
-                    {
-                        var fileUrl = await _firebaseStorageService.UploadImageAsync(stream, fileName, contentType);
-                        
-                        // Update the Image URL in the BookDto
-                        bookDto.Image = fileUrl;
-                    }
-                }
-
-                // Update the book details using your service layer
-                await _bookService.UpdateBookAsync(id, bookDto);
-
-                return Ok(new { message = "Book updated successfully", book = bookDto });
+                await _bookService.UpdateBookAsync(id, bookDto, files);
+                return Ok(new { message = "Book updated successfully" });
             }
             catch (ArgumentException ex)
             {
@@ -192,7 +122,9 @@ namespace BookStore.Controllers
             {
                 return StatusCode(500, $"An error occurred: {ex.Message}");
             }
+               
         }
+
 
 
         // Xóa sách

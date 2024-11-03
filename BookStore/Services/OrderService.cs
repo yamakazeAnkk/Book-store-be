@@ -4,9 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using BookStore.DTOs;
+using BookStore.Helper;
 using BookStore.Models;
 using BookStore.Repositories.Interfaces;
 using BookStore.Services.Interfaces;
+using Microsoft.VisualBasic;
 
 namespace BookStore.Services
 {
@@ -78,7 +80,7 @@ namespace BookStore.Services
                 var voucher = await _voucherRepository.GetVoucherByCodeAsync(createOrderDto.Code);
                 if (voucher != null && voucher.ExpiredDate >= DateTime.UtcNow && totalAmount >= voucher.MinCost)
                 {
-                    var voucherUser = await _voucherUserRepository.GetVoucherByUserIdAndVoucherIdAsync(currentUser.UserId, voucher.VoucherId);
+                    var voucherUser = await _voucherUserRepository.GetVoucherByUserAndVoucherIdAsync(currentUser.UserId, voucher.VoucherId);
                     if (voucherUser != null && voucherUser.IsUsed != 0)
                     {
                         decimal discount = Math.Min(voucher.Discount, totalAmount);
@@ -108,13 +110,13 @@ namespace BookStore.Services
         {
             var bestSellers = await _orderItemRepository.GetBestSellersAsync();
             var bestSellerDto  =  bestSellers
-            .OrderByDescending(pc => pc.Count)
-            .Take(amount)
-            .Select(pc => new OrderItemDto {
-                
-                Quantity = pc.Count, 
-                BooksDto = _mapper.Map<BooksDto>(pc.Book)
-            }
+                .OrderByDescending(pc => pc.Count)
+                .Take(amount)
+                .Select(pc => new OrderItemDto {
+                    
+                    Quantity = pc.Count, 
+                    BooksDto = _mapper.Map<BooksDto>(pc.Book)
+                }
 
             )
             .ToList();
@@ -130,41 +132,101 @@ namespace BookStore.Services
         public async Task<IEnumerable<OrderItemDto>> GetOrderDetailsAsync(long orderId)
         {
            var orderItems = await _orderItemRepository.FindAllByOrderIdAsync(orderId);
-            return _mapper.Map<IEnumerable<OrderItemDto>>(orderItems);
+        return _mapper.Map<IEnumerable<OrderItemDto>>(orderItems);
         }
 
-        public async Task<IEnumerable<OrderDetailDto>> GetOrdersRecentAsync(int pageNumber, int sizeNumber)
+        public async Task<PaginatedResult<OrderDetailDto>> GetOrdersRecentAsync(int pageNumber, int sizeNumber)
         {
             var orders = await _orderRepository.GetRecentOrdersAsync(pageNumber,sizeNumber);
-            return _mapper.Map<IEnumerable<OrderDetailDto>>(orders);
+            var orderDtos = _mapper.Map<IEnumerable<OrderDetailDto>>(orders.Items);
+
+   
+            return new PaginatedResult<OrderDetailDto>(orderDtos, orders.TotalCount, sizeNumber);
         }
 
 
-        public async Task<IEnumerable<OrderDetailDto>> GetOrdersRecentByUserAsync(string emailUser, int page, int size)
+        public async Task<PaginatedResult<OrderDetailDto>> GetOrdersRecentByUserAsync(string emailUser, int page, int size)
         {
             var user = await _userRepository.GetUserByEmailAsync(emailUser);
             if(user == null){
                 throw new Exception("User not found");
             }
-            var orders = await _orderRepository.GetRecentOrdersByUserIdAsync(user.UserId,page,size);
-            return _mapper.Map<IEnumerable<OrderDetailDto>>(orders);
+            var orders = await _orderRepository.GetRecentOrdersByUserIdAsync(user.UserId, page, size);
+            var orderDtos = _mapper.Map<IEnumerable<OrderDetailDto>>(orders.Items);
+
+ 
+            return new PaginatedResult<OrderDetailDto>(orderDtos, orders.TotalCount, size);
         }
 
         public async Task<double> GetTotalRevenueAsync()
         {
             return await _orderRepository.GetTotalRevenueAsync();
         }
-        public async Task<IEnumerable<OrderDetailDto>> SearchOrdersByNameAsync(string name, int page, int size)
+        public async Task<PaginatedResult<OrderDetailDto>> SearchOrdersByNameAsync(string name, int page, int size)
         {
             var orders = await _orderRepository.SearchOrdersByNameAsync(name, page, size);
-            return _mapper.Map<IEnumerable<OrderDetailDto>>(orders);
+            var orderDtos = _mapper.Map<IEnumerable<OrderDetailDto>>(orders.Items);
+
+   
+            return new PaginatedResult<OrderDetailDto>(orderDtos, orders.TotalCount, size);
         }
 
-        public async Task<IEnumerable<OrderDetailDto>> SearchOrdersByDateAsync(int month, int year, int page, int size)
+        public async Task<PaginatedResult<OrderDetailDto>> SearchOrdersByDateAsync(int month, int year, int page, int size)
         {
             var orders = await _orderRepository.SearchOrdersByDateAsync(month, year, page, size);
-            return _mapper.Map<IEnumerable<OrderDetailDto>>(orders);
+            var orderDtos = _mapper.Map<IEnumerable<OrderDetailDto>>(orders.Items);
+
+   
+            return new PaginatedResult<OrderDetailDto>(orderDtos, orders.TotalCount, size);
         }
 
+        public async Task UpdateStateAsync(int orderId, string status)
+        {
+            var orders = await _orderRepository.GetOrderByIdAsync(orderId);
+            if(orders == null){
+                throw new Exception("Order not found");
+            }
+            orders.Status = status;
+            await _orderRepository.UpdateOrderAsync(orders);
+        }
+
+        public async Task<PaginatedResult<OrderDetailDto>> FilterOrderByStateAsync(string status, int page, int size)
+        {
+            
+            var orders = await _orderRepository.FilterOrderByStateAsync(status,page,size);
+            var orderDtos = _mapper.Map<IEnumerable<OrderDetailDto>>(orders.Items);
+
+  
+            return new PaginatedResult<OrderDetailDto>(orderDtos, orders.TotalCount, size);
+        }
+
+        public async Task CancelOrderAsync(int orderId, string userName)
+        {
+
+            var orders = await _orderRepository.GetOrderByIdAsync(orderId);
+            if(orders == null){
+                throw new Exception("Order not found");
+            }
+            var user = await _userRepository.GetUserByEmailAsync(userName);
+            if(user == null){
+                throw new Exception("User not found");
+            }
+            orders.Status = "Cancel";
+            await _orderRepository.UpdateOrderAsync(orders);
+        }
+
+        public async Task<decimal> GetTotalRevenueByQuarterAsync(int year, int quarter)
+        {
+            return await _orderRepository.GetTotalRevenueByQuarterAsync(year, quarter);
+        }
+
+        public async Task<decimal> GetTotalRevenueByYearAsync(int year)
+        {
+            return await _orderRepository.GetTotalRevenueByYearAsync(year);
+        }
+
+    
+
+       
     }
 }

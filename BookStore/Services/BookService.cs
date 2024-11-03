@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using BookStore.DTOs;
+using BookStore.Helper;
 using BookStore.Models;
 using BookStore.Repositories;
 using BookStore.Repositories.Interfaces;
@@ -19,27 +20,47 @@ namespace BookStore.Services
         private readonly IMapper _mapper;
         private readonly FirebaseStorageService _firebaseStorageService;
 
+        private readonly IFileUploadService _fileUploadService;
         private readonly IBrandRepository _brandRepository;
 
-        public BookService( IBookRepository bookRepository, IMapper mapper, FirebaseStorageService firebaseStorageService,IBrandRepository brandRepository){
+        public BookService(IFileUploadService fileUploadService, IBookRepository bookRepository, IMapper mapper, FirebaseStorageService firebaseStorageService,IBrandRepository brandRepository){
             _bookRepository = bookRepository;
             _mapper = mapper;
             _firebaseStorageService = firebaseStorageService;
             _brandRepository = brandRepository;
+            _fileUploadService = fileUploadService;
        
         }
-       public async Task<Book> AddBookAsync(BookDto bookDto)
+       public async Task<Book> AddBookAsync(CreateBookDto bookDto, UploadFilesDto filesDto)
         {
-            // Ánh xạ BookDto sang Book
+            
             var book = _mapper.Map<Book>(bookDto);
 
-            // Thêm Book vào cơ sở dữ liệu
+         
             var createdBook = await _bookRepository.AddBookAsync(book);
+
+        
+            if (filesDto?.ImageFile != null && filesDto.ImageFile.Length > 0)
+            {
+               
+
+                var fileName = Guid.NewGuid() + Path.GetExtension(filesDto.ImageFile.FileName);
+                var imageUrl = await _fileUploadService.UploadImageAsync(filesDto.ImageFile);
+                createdBook.Image = imageUrl;
+            }
+
+            // Xử lý tải lên eBook nếu có
+            if (filesDto?.EbookFile != null && filesDto.EbookFile.Length > 0)
+            {
+                var ebookFileName = Guid.NewGuid() + Path.GetExtension(filesDto.EbookFile.FileName);
+                var ebookUrl = await _fileUploadService.UploadEbookAsync(filesDto.EbookFile);
+                createdBook.LinkEbook = ebookUrl;
+            }
 
             // Kiểm tra nếu có BrandId nào được cung cấp
             if (bookDto.brandId != null && bookDto.brandId.Count > 0)
             {
-                // Khởi tạo một danh sách các BookBrand để thêm vào một lần
+              
                 var bookBrands = bookDto.brandId
                     .Distinct() // Đảm bảo mỗi brandId chỉ thêm một lần
                     .Select(brandId => new BookBrand
@@ -49,12 +70,16 @@ namespace BookStore.Services
                     })
                     .ToList();
 
-             
-                
+              
+                await _bookRepository.AddBookBrandAsync(bookBrands);
             }
+
+            
+            await _bookRepository.UpdateBookAsync(createdBook);
 
             return createdBook;
         }
+
 
 
 
@@ -63,10 +88,13 @@ namespace BookStore.Services
             await _bookRepository.DeleteBookAsync(bookId);
         }
 
-        public async Task<IEnumerable<BookDto>> FilterBooksByBrandAsync(List<int> brandId, int page, int size)
+        public async Task<PaginatedResult<BookDto>> FilterBooksByBrandAsync(List<int> brandId, int page, int size)
         {
             var books = await _bookRepository.FilterBooksByBrandAsync(brandId,page,size);
-            return _mapper.Map<IEnumerable<BookDto>>(books);
+            var bookDtos = _mapper.Map<IEnumerable<BookDto>>(books.Items);
+
+  
+            return new PaginatedResult<BookDto>(bookDtos, books.TotalCount, size);
         }
 
         public async Task<BookDetailsDto> GetBookByIdAsync(int bookId)
@@ -75,29 +103,50 @@ namespace BookStore.Services
              return _mapper.Map<BookDetailsDto>(books);
         }
 
-        public async Task<IEnumerable<BookDetailsDto>> GetBooksPagedAsync(int pageNumber, int pageSize)
+        public async Task<PaginatedResult<BookDetailsDto>> GetBooksPagedAsync(int pageNumber, int pageSize)
         {
             var books = await _bookRepository.GetBooksPagedAsync(pageNumber, pageSize);
-            return _mapper.Map<IEnumerable<BookDetailsDto>>(books);
+            
+            var bookDtos = _mapper.Map<IEnumerable<BookDetailsDto>>(books.Items);
+
+   
+            return new PaginatedResult<BookDetailsDto>(bookDtos, books.TotalCount, pageSize);
         }
 
-        public async Task<IEnumerable<BookDto>> SearchBooksByTitleAsync(string title, int page, int size)
+        public async Task<PaginatedResult<BookDto>> SearchBooksByTitleAsync(string title, int page, int size)
         {
             var books = await _bookRepository.SearchBooksByTitleAsync(title,page,size);
-            return _mapper.Map<IEnumerable<BookDto>>(books);
+            var bookDtos = _mapper.Map<IEnumerable<BookDto>>(books.Items);
+
+ 
+            return new PaginatedResult<BookDto>(bookDtos, books.TotalCount, size);
         }
 
-        public async Task<IEnumerable<BookDto>> SortBooksByPriceAsync(decimal min, decimal max, int page, int size)
+        public async Task<PaginatedResult<BookDto>> SortBooksByPriceAsync(decimal min, decimal max, int page, int size)
         {
             var books = await _bookRepository.SortBooksByPriceAsync(min,max,page,size);
-            return _mapper.Map<IEnumerable<BookDto>>(books);
+            var bookDtos = _mapper.Map<IEnumerable<BookDto>>(books.Items);
+
+   
+             return new PaginatedResult<BookDto>(bookDtos, books.TotalCount, size);
+
         }
 
-        public async Task UpdateBookAsync(int id,BookDto bookDto)
+        public async Task UpdateBookAsync(int id,CreateBookDto bookDto,UploadFilesDto files)
         {
             var book = await _bookRepository.GetBookByIdAsync(id);
             if(book == null){
                 throw new Exception("Book not found");
+            }
+            if (files?.ImageFile != null)
+            {
+                book.Image = await _fileUploadService.UploadImageAsync(files.ImageFile);
+            }
+
+            // Tải lên eBook nếu có
+            if (files?.EbookFile != null)
+            {
+                book.LinkEbook = await _fileUploadService.UploadEbookAsync(files.EbookFile);
             }
             _mapper.Map(bookDto,book);
 

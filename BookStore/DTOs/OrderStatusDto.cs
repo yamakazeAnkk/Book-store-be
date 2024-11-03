@@ -5,16 +5,11 @@ using System.Threading.Tasks;
 
 namespace BookStore.DTOs
 {
-    public class OrderDetailDto
+    public class OrderStatusDto
     {
-        public int OrderId { get; set; }
-
-        public DateTime OrderDate { get; set; }
-
-        public decimal TotalAmount {get ; set;}
-
+    
+        
         public string Status { get; set; } = null!;
-
         public string? Name { get; set; }
         public string? Phone { get; set; }
         public string? Address { get; set; }

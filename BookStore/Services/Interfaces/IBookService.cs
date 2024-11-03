@@ -3,20 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BookStore.DTOs;
+using BookStore.Helper;
 using BookStore.Models;
 
 namespace BookStore.Services.Interfaces
 {
     public interface IBookService
     {
-        Task<IEnumerable<BookDetailsDto>> GetBooksPagedAsync(int pageNumber, int pageSize);
+        Task<PaginatedResult<BookDetailsDto>> GetBooksPagedAsync(int pageNumber, int pageSize);
         Task<BookDetailsDto> GetBookByIdAsync(int bookId);
-        Task<Book>AddBookAsync(BookDto bookDto);
-        Task UpdateBookAsync(int id,BookDto bookDto);
+        Task<Book>AddBookAsync(CreateBookDto bookDto,UploadFilesDto filesDto);
+        Task UpdateBookAsync(int id,CreateBookDto bookDto,UploadFilesDto filesDto);
         Task DeleteBookAsync(int bookId);
-        Task<IEnumerable<BookDto>> SearchBooksByTitleAsync(string title, int page, int size);
-        Task<IEnumerable<BookDto>> FilterBooksByBrandAsync(List<int> brandIds, int page, int size);
-        Task<IEnumerable<BookDto>> SortBooksByPriceAsync(decimal min, decimal max, int page, int size);
+        Task<PaginatedResult<BookDto>> SearchBooksByTitleAsync(string title, int page, int size);
+        Task<PaginatedResult<BookDto>> FilterBooksByBrandAsync(List<int> brandIds, int page, int size);
+        Task<PaginatedResult<BookDto>> SortBooksByPriceAsync(decimal min, decimal max, int page, int size);
 
         
     }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BookStore.DTOs;
+using BookStore.Helper;
 using BookStore.Models;
 using BookStore.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -21,14 +22,13 @@ namespace BookStore.Repositories
             await _bookStoreContext.Users.AddAsync(user);
         }
 
-        public async Task<IEnumerable<User>> GetAllUserAsync()
+        public async Task<PaginatedResult<User>> GetAllUserAsync(int page, int size)
         {
-            return await _bookStoreContext.Users.ToListAsync();
-        }
-
-        public async Task<IEnumerable<User>> GetAllUserAsync(int page, int size)
-        {
-            return await _bookStoreContext.Users.Skip((page - 1) * size).Take(page).ToListAsync();
+            int totalCount = await _bookStoreContext.Users
+                                            .CountAsync(user => user.RoleId != 1);
+            var users = await _bookStoreContext.Users.Where(user => user.RoleId != 1).OrderBy(user => user.UserId).Skip((page - 1) * size).Take(size).ToListAsync();
+            
+            return new PaginatedResult<User>(users,totalCount,size);
         }
 
         public async Task<Role> GetRoleByNameAsync(string role)

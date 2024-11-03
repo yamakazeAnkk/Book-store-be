@@ -17,5 +17,7 @@ namespace BookStore.Repositories.Interfaces
 
         Task UpdateVoucherAsync(Voucher voucher);
         Task DeleteVoucherAsync(int voucherId);
+
+        Task<IEnumerable<Voucher>> GetVouchersByUserIdAsync(int userId);
     }
 }

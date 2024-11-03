@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BookStore.DTOs;
+using BookStore.Helper;
 using BookStore.Models;
 using BookStore.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -29,9 +30,7 @@ namespace BookStore.Repositories
         public async Task<IEnumerable<ProductCount>> GetBestSellersAsync()
         {
             return await _context.OrderItems
-                .Include(oi => oi.Book)
-                .ThenInclude(o => o.BookBrands)
-                .ThenInclude(b => b.Band) 
+                .Include(oi => oi.Book) 
                 .GroupBy(od => od.BookId)
                 .Select(g => new ProductCount
                 {
@@ -44,6 +43,7 @@ namespace BookStore.Repositories
 
              
         }
+
 
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using BookStore.DTOs;
+using BookStore.Helper;
 using BookStore.Models;
 using BookStore.Repositories;
 using BookStore.Repositories.Interfaces;
@@ -23,10 +24,15 @@ namespace BookStore.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<UserDetailDto>> GetUserAllAsync(int page, int size)
+        public async Task<PaginatedResult<UserDetailDto>> GetUserAllAsync(int page, int size)
         {
+            
             var users = await _userRepository.GetAllUserAsync(page,size);
-            return _mapper.Map<IEnumerable<UserDetailDto>>(users);
+            
+            var userDtos = _mapper.Map<IEnumerable<UserDetailDto>>(users.Items);
+
+            // Tạo đối tượng `PaginatedResult` mới với DTOs
+            return new PaginatedResult<UserDetailDto>(userDtos, users.TotalCount, size);
         }
 
         public async Task<User> GetUserByEmailAsync(string email)

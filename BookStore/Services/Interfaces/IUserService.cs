@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BookStore.DTOs;
+using BookStore.Helper;
 using BookStore.Models;
 
 namespace BookStore.Services.Interfaces
@@ -15,7 +16,7 @@ namespace BookStore.Services.Interfaces
 
         Task<User> GetUserByEmailAsync(string email);
 
-        Task<IEnumerable<UserDetailDto>> GetUserAllAsync(int page, int size);
+        Task<PaginatedResult<UserDetailDto>> GetUserAllAsync(int page, int size);
 
         Task UpdateUserAsync(int id, CreateUserDetailDto createUserDetailDto);
 

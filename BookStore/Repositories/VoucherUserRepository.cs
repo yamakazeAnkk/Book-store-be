@@ -27,7 +27,9 @@ namespace BookStore.Repositories
             .FirstOrDefaultAsync(vu => vu.UserId == userId);
         }
 
-        public async Task<VoucherUser> GetVoucherByUserIdAndVoucherIdAsync(int userId,int voucherId)
+   
+
+        public async Task<VoucherUser> GetVoucherByUserAndVoucherIdAsync(int userId,int voucherId)
         {
             return await _context.VoucherUsers
             .FirstOrDefaultAsync(vu => vu.UserId == userId && vu.VoucherId == voucherId);
