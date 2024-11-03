@@ -162,9 +162,40 @@ namespace BookStore.Services
 
             foreach (var book in lowStockBooks)
             {
-                
-                await _hubContext.Clients.All.SendAsync("NotifyLowStock", $"The book '{book.Title}' has less than 10 items in stock.");
+                await _hubContext.Clients.All.SendAsync("NotifyAdmin", $"The book '{book.Title}' is low on stock (Quantity: {book.Quantity}).");
             }
+
+            // Tính thời điểm 3 tháng trước
+            var threeMonthsAgo = DateTime.Now.AddMonths(-3);
+
+            // Lấy danh sách sách bị tồn kho
+            var stagnantBooks = await _bookRepository.GetBooksAsync(b =>
+                (b.UploadDate <= threeMonthsAgo && !b.OrderItems.Any()) ||
+                (b.OrderItems.Any() && b.OrderItems.Max(oi => oi.Order.OrderDate) <= threeMonthsAgo)
+            );
+
+            foreach (var book in stagnantBooks)
+            {
+                await _hubContext.Clients.All.SendAsync("NotifyAdmin", $"The book '{book.Title}' has been stagnant for over 3 months and may need a discount.");
+            }
+        }
+
+        public async Task<PaginatedResult<BookDto>> GetLowStockBooksAsync(int page, int size)
+        {
+            var books = await _bookRepository.GetLowStockBooksAsync(page,size);
+            var bookDtos = _mapper.Map<IEnumerable<BookDto>>(books.Items);
+
+   
+             return new PaginatedResult<BookDto>(bookDtos, books.TotalCount, size);
+        }
+
+        public async Task<PaginatedResult<BookDto>> GetStagnantBooksAsync(int page, int size)
+        {
+            var books = await _bookRepository.GetStagnantBooksAsync(page,size);
+            var bookDtos = _mapper.Map<IEnumerable<BookDto>>(books.Items);
+
+   
+             return new PaginatedResult<BookDto>(bookDtos, books.TotalCount, size);
         }
     }
 }

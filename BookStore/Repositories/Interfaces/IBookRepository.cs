@@ -23,6 +23,8 @@ namespace BookStore.Repositories.Interfaces
 
         Task<IEnumerable<Book>> GetBooksAsync(Expression<Func<Book, bool>> predicate);
 
+        Task<PaginatedResult<Book>> GetLowStockBooksAsync(int page ,int size);
+        Task<PaginatedResult<Book>> GetStagnantBooksAsync(int page ,int size);
         
        
 

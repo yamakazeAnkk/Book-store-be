@@ -154,6 +154,10 @@ builder.Services.AddCors(p => p.AddPolicy("MyCors", build =>
 {
     build.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
 }));
+builder.Services.AddSignalR();
+
+// Thêm vào middleware
+
 
 var app = builder.Build();
 
@@ -165,7 +169,7 @@ if (app.Environment.IsDevelopment())
 }
 
 
-
+app.MapHub<NotificationHub>("/notificationHub");
 app.UseCors("MyCors");
 
 app.UseAuthentication();

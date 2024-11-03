@@ -1,6 +1,5 @@
 /Users/nguyenan/StudioProjects/BookStore/BookStore/bin/Debug/net6.0/appsettings.Development.json
 /Users/nguyenan/StudioProjects/BookStore/BookStore/bin/Debug/net6.0/appsettings.json
-/Users/nguyenan/StudioProjects/BookStore/BookStore/bin/Debug/net6.0/bookstore-59884-firebase-adminsdk-p59pi-12966435ab.json
 /Users/nguyenan/StudioProjects/BookStore/BookStore/bin/Debug/net6.0/BookStore
 /Users/nguyenan/StudioProjects/BookStore/BookStore/bin/Debug/net6.0/BookStore.deps.json
 /Users/nguyenan/StudioProjects/BookStore/BookStore/bin/Debug/net6.0/BookStore.runtimeconfig.json
@@ -93,3 +92,4 @@
 /Users/nguyenan/StudioProjects/BookStore/BookStore/bin/Debug/net6.0/Microsoft.AspNetCore.JsonPatch.dll
 /Users/nguyenan/StudioProjects/BookStore/BookStore/bin/Debug/net6.0/Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll
 /Users/nguyenan/StudioProjects/BookStore/BookStore/bin/Debug/net6.0/Newtonsoft.Json.Bson.dll
+/Users/nguyenan/StudioProjects/BookStore/BookStore/bin/Debug/net6.0/bookstore-59884-firebase-adminsdk-p59pi-12966435ab.json

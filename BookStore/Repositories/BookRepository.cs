@@ -98,6 +98,44 @@ namespace BookStore.Repositories
             return new PaginatedResult<Book>(books, totalCount, pageSize);
         }
 
+        public async Task<PaginatedResult<Book>> GetLowStockBooksAsync(int page, int size)
+        {
+            var query = _bookStoreContext.Books
+                .Where(b => b.Quantity <= 10);
+
+            int totalCount = await query.CountAsync();
+
+            var lowStockBooks = await query
+                .OrderBy(b => b.Title) 
+                .Skip((page - 1) * size)
+                .Take(size)
+                .ToListAsync();
+
+            return new PaginatedResult<Book>(lowStockBooks, totalCount, size);
+        }
+
+        public async Task<PaginatedResult<Book>> GetStagnantBooksAsync(int page, int size)
+        {
+            var threeMonthsAgo = DateTime.Now.AddMonths(-3);
+
+            var query = _bookStoreContext.Books
+                .Where(b =>
+                    (b.UploadDate <= threeMonthsAgo) || // 3 tháng từ ngày upload
+                    !b.OrderItems.Any() || // Sách chưa từng được order
+                    b.OrderItems.Max(oi => oi.Order.OrderDate) <= threeMonthsAgo // 3 tháng từ lần order gần nhất
+                );
+
+            int totalCount = await query.CountAsync();
+
+            var stagnantBooks = await query
+                .OrderBy(b => b.Title) // Có thể thay đổi để sắp xếp theo thuộc tính khác
+                .Skip((page - 1) * size)
+                .Take(size)
+                .ToListAsync();
+
+            return new PaginatedResult<Book>(stagnantBooks, totalCount, size);
+        }
+
         public async Task<PaginatedResult<Book>> SearchBooksByTitleAsync(string searchTerm, int page, int size)
         {
             int totalCount = await _bookStoreContext.Books

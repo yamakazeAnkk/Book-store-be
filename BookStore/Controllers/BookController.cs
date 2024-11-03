@@ -93,7 +93,29 @@ namespace BookStore.Controllers
         }
 
       
-        
+        [HttpGet("low-stock")]
+        public async Task<IActionResult> GetLowStockBooks(int page = 1, int size = 10)
+        {
+            var books = await _bookService.GetLowStockBooksAsync(page, size);
+            if (books.Items == null || !books.Items.Any())
+            {
+                return NotFound(new { message = "No low stock books found." });
+            }
+
+            return Ok(books);
+        }
+
+        [HttpGet("stagnant")]
+        public async Task<IActionResult> GetStagnantBooks(int page = 1, int size = 10)
+        {
+            var books = await _bookService.GetStagnantBooksAsync(page, size);
+            if (books.Items == null || !books.Items.Any())
+            {
+                return NotFound(new { message = "No stagnant books found." });
+            }
+
+            return Ok(books);
+        }
 
 
         // Cập nhật sách
@@ -125,6 +147,12 @@ namespace BookStore.Controllers
                
         }
 
+        [HttpPost("check-stock")]
+        public async Task<IActionResult> CheckStockAndNotify()
+        {
+            await _bookService.CheckBookQuantityAndNotifyAsync();
+            return Ok(new { message = "Notification check completed" });
+        }
 
 
         // Xóa sách
