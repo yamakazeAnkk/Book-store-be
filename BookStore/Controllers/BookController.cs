@@ -48,6 +48,11 @@ namespace BookStore.Controllers
             var pagedBooks = await _bookService.SortBooksByPriceAsync(min,max,pageNumber,pageSize);
             return Ok(pagedBooks);
         }
+        [HttpGet("search-all")]
+        public async Task<IActionResult> SearchAllBooks([FromQuery]List<int> id,string name ,int pageNumber=  1 ,int pageSize =10 ){
+            var pagedBooks = await _bookService.SearchAllBooksAsync(name,id,pageNumber,pageSize);
+            return Ok(pagedBooks);
+        }
 
         // Lấy sách theo ID
         [HttpGet("{id}")]

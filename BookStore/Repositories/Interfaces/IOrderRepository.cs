@@ -29,6 +29,8 @@ namespace BookStore.Repositories.Interfaces
         Task<PaginatedResult<Order>> SearchOrdersByDateAsync(int month, int year,int page, int size);
 
         Task<PaginatedResult<Order>> GetRecentOrdersByUserIdAsync(int userId, int page, int size);
+
+        Task<PaginatedResult<Order>> SearchAllOrderAsync(string name);
         
     }
 }

@@ -16,11 +16,11 @@ namespace BookStore.Services
         }
         public async Task<string> UploadEbookAsync(IFormFile file)
         {
-            if (file == null || !file.ContentType.StartsWith("image/"))
+            
+            if (file == null)
             {
-                throw new ArgumentException("Invalid image file");
+                throw new ArgumentException("Invalid eBook file");
             }
-
             var fileName = Guid.NewGuid() + Path.GetExtension(file.FileName);
             using (var stream = file.OpenReadStream())
             {
@@ -30,9 +30,9 @@ namespace BookStore.Services
 
         public async Task<string> UploadImageAsync(IFormFile file)
         {
-            if (file == null)
+            if (file == null || !file.ContentType.StartsWith("image/"))
             {
-                throw new ArgumentException("Invalid eBook file");
+                throw new ArgumentException("Invalid image file");
             }
 
             var fileName = Guid.NewGuid() + Path.GetExtension(file.FileName);

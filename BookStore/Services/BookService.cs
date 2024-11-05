@@ -197,5 +197,14 @@ namespace BookStore.Services
    
              return new PaginatedResult<BookDto>(bookDtos, books.TotalCount, size);
         }
+
+        public async Task<PaginatedResult<BookDto>> SearchAllBooksAsync(string title, List<int> brandIds, int page, int size)
+        {
+            var books = await _bookRepository.SearchAllBookAsync(title,brandIds,page,size);
+            var bookDtos = _mapper.Map<IEnumerable<BookDto>>(books.Items);
+
+ 
+            return new PaginatedResult<BookDto>(bookDtos, books.TotalCount, size);
+        }
     }
 }

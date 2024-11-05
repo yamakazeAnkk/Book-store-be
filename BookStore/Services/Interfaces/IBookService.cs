@@ -16,10 +16,13 @@ namespace BookStore.Services.Interfaces
         Task UpdateBookAsync(int id,CreateBookDto bookDto,UploadFilesDto filesDto);
         Task DeleteBookAsync(int bookId);
 
+
+
         Task CheckBookQuantityAndNotifyAsync();
         Task<PaginatedResult<BookDto>> GetLowStockBooksAsync(int page, int size);
         Task<PaginatedResult<BookDto>> GetStagnantBooksAsync(int page, int size);
         Task<PaginatedResult<BookDto>> SearchBooksByTitleAsync(string title, int page, int size);
+        Task<PaginatedResult<BookDto>> SearchAllBooksAsync(string title,List<int> brandIds, int page, int size);
         Task<PaginatedResult<BookDto>> FilterBooksByBrandAsync(List<int> brandIds, int page, int size);
 
         Task<PaginatedResult<BookDto>> SortBooksByPriceAsync(decimal min, decimal max, int page, int size);

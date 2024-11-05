@@ -136,6 +136,38 @@ namespace BookStore.Repositories
             return new PaginatedResult<Book>(stagnantBooks, totalCount, size);
         }
 
+        public async Task<PaginatedResult<Book>> SearchAllBookAsync(string title, List<int> brandIds, int page, int size)
+        {
+            var query = _bookStoreContext.Books.AsQueryable();
+
+             if (!string.IsNullOrEmpty(title) && (brandIds == null || brandIds.Count == 0))
+            {
+              
+                query = query.Where(b => EF.Functions.Like(b.Title, $"%{title}%") || EF.Functions.Like(b.AuthorName, $"%{title}%"));
+            }
+            else if (string.IsNullOrEmpty(title) && brandIds != null && brandIds.Count > 0)
+            {
+            
+                query = query.Where(b => b.BookBrands.Any(bb => brandIds.Contains(bb.BandId.GetValueOrDefault())));
+            }
+            else if (!string.IsNullOrEmpty(title) && brandIds != null && brandIds.Count > 0)
+            {
+            
+                query = query.Where(b =>
+                    EF.Functions.Like(b.Title, $"%{title}%") || EF.Functions.Like(b.AuthorName, $"%{title}%") ||
+                    b.BookBrands.Any(bb => brandIds.Contains(bb.BandId.GetValueOrDefault())));
+            }
+            int totalCount = await query.CountAsync();
+            var books = await query
+            .Include(u => u.BookBrands)
+                .ThenInclude(x => x.Band)
+                .OrderBy(b => b.Title) 
+                .Skip((page - 1) * size) 
+                .Take(size) 
+                .ToListAsync();
+            return new PaginatedResult<Book>(books,totalCount,size);
+        }
+
         public async Task<PaginatedResult<Book>> SearchBooksByTitleAsync(string searchTerm, int page, int size)
         {
             int totalCount = await _bookStoreContext.Books
