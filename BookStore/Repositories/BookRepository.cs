@@ -140,23 +140,17 @@ namespace BookStore.Repositories
         {
             var query = _bookStoreContext.Books.AsQueryable();
 
-             if (!string.IsNullOrEmpty(title) && (brandIds == null || brandIds.Count == 0))
+
+            if ((!string.IsNullOrEmpty(title) && brandIds == null) || brandIds.Count == 0)
             {
-              
-                query = query.Where(b => EF.Functions.Like(b.Title, $"%{title}%") || EF.Functions.Like(b.AuthorName, $"%{title}%"));
+                query = query.Where(b => EF.Functions.Like(b.Title, $"%{title}%") ||  EF.Functions.Like(b.AuthorName, $"%{title}%" ));
+            }else if (string.IsNullOrEmpty(title) && (brandIds != null || brandIds.Count > 0))
+            {   
+               return await FilterBooksByBrandAsync(brandIds, page, size);
+            }else if ((!string.IsNullOrEmpty(title) && brandIds != null) || brandIds.Count > 0){
+                query = query.Where(b => b.BookBrands.Any(bb => brandIds.Contains(bb.BandId.GetValueOrDefault())) && EF.Functions.Like(b.Title, $"%{title}%") ||  EF.Functions.Like(b.AuthorName, $"%{title}%" ));
             }
-            else if (string.IsNullOrEmpty(title) && brandIds != null && brandIds.Count > 0)
-            {
             
-                query = query.Where(b => b.BookBrands.Any(bb => brandIds.Contains(bb.BandId.GetValueOrDefault())));
-            }
-            else if (!string.IsNullOrEmpty(title) && brandIds != null && brandIds.Count > 0)
-            {
-            
-                query = query.Where(b =>
-                    EF.Functions.Like(b.Title, $"%{title}%") || EF.Functions.Like(b.AuthorName, $"%{title}%") ||
-                    b.BookBrands.Any(bb => brandIds.Contains(bb.BandId.GetValueOrDefault())));
-            }
             int totalCount = await query.CountAsync();
             var books = await query
             .Include(u => u.BookBrands)

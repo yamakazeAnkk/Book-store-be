@@ -30,7 +30,7 @@ namespace BookStore.Repositories.Interfaces
 
         Task<PaginatedResult<Order>> GetRecentOrdersByUserIdAsync(int userId, int page, int size);
 
-        Task<PaginatedResult<Order>> SearchAllOrderAsync(string name);
+        Task<PaginatedResult<Order>> SearchAllOrderAsync(string name,string month, string state ,int page ,int size);
         
     }
 }

@@ -34,6 +34,7 @@ namespace BookStore.Services
             // Tạo đối tượng `PaginatedResult` mới với DTOs
             return new PaginatedResult<UserDetailDto>(userDtos, users.TotalCount, size);
         }
+       
 
         public async Task<User> GetUserByEmailAsync(string email)
         {

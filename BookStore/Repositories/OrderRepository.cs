@@ -142,6 +142,11 @@ namespace BookStore.Repositories
                 .SumAsync(o => o.TotalAmount);
         }
 
+        public Task<PaginatedResult<Order>> SearchAllOrderAsync(string name, string month, string state, int page, int size)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<PaginatedResult<Order>> SearchOrdersByDateAsync(int month, int year, int page, int size)
         {
             var query = _context.Orders

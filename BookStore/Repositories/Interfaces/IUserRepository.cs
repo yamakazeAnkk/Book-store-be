@@ -14,6 +14,7 @@ namespace BookStore.Repositories.Interfaces
 
         Task<User> GetUserByNameAsync(string username);
 
+
         Task<PaginatedResult<User>> GetAllUserAsync(int page , int size);
 
         Task AddUserAsync(User user);

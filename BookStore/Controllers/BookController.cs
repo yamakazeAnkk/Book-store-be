@@ -49,7 +49,7 @@ namespace BookStore.Controllers
             return Ok(pagedBooks);
         }
         [HttpGet("search-all")]
-        public async Task<IActionResult> SearchAllBooks([FromQuery]List<int> id,string name ,int pageNumber=  1 ,int pageSize =10 ){
+        public async Task<IActionResult> SearchAllBooks([FromQuery]List<int> id,string? name = null ,int pageNumber=  1 ,int pageSize =10 ){
             var pagedBooks = await _bookService.SearchAllBooksAsync(name,id,pageNumber,pageSize);
             return Ok(pagedBooks);
         }
