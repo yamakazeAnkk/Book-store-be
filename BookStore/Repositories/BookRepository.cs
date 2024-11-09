@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using System.Xml.Schema;
 using BookStore.Helper;
 using BookStore.Models;
 using BookStore.Repositories.Interfaces;
@@ -72,6 +73,25 @@ namespace BookStore.Repositories
             }
         }
 
+        public async Task<PaginatedResult<Book>> FilterBookPurchasedBookByUserAsync(int id, int page, int size)
+        {
+            var query = _bookStoreContext.PurchasedEbooks
+            .Where(pe => pe.UserId == id)
+            .Include(pe => pe.Book)
+            .Select(pe => pe.Book)
+            .Where(book => book != null)
+            .AsQueryable();
+
+            var totalCount = await query.CountAsync();
+
+            var books = await query
+                .Skip((page - 1) * size)
+                .Take(size)
+                .ToListAsync();
+            return new PaginatedResult<Book>(books,totalCount,size);
+
+        }
+
         public async Task<PaginatedResult<Book>> FilterBooksByBrandAsync(List<int> brandIds, int page, int size)
         {
             int totalCount = await _bookStoreContext.BookBrands
@@ -86,6 +106,18 @@ namespace BookStore.Repositories
                 .ThenInclude(bb => bb.Band)
                 .GroupBy(bb => bb.Book.BookId) // Nhóm theo `BookId` để loại bỏ trùng lặp
                 .Select(g => g.First().Book)   // Lấy `Book` đầu tiên từ mỗi nhóm
+                .Skip((page - 1) * size)
+                .Take(size)
+                .ToListAsync();
+            return new PaginatedResult<Book>(books,totalCount,size);
+        }
+
+        public async Task<PaginatedResult<Book>> FilterTypeBookAsync(int id, int page, int size)
+        {
+            var query = _bookStoreContext.Books.Where(b => b.TypeBookId == id);
+            var totalCount = await query.CountAsync();
+
+            var books = await query
                 .Skip((page - 1) * size)
                 .Take(size)
                 .ToListAsync();

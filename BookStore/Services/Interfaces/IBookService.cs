@@ -29,5 +29,11 @@ namespace BookStore.Services.Interfaces
 
         Task<IEnumerable<BookDto>> GetTopBooksAsync(int topCount);
         Task<IEnumerable<BookDto>> GetLatestBooksAsync(int latestCount);
+
+        Task<IEnumerable<BookDto>> GetBestSellerAsync(int bestCount);
+
+        Task<PaginatedResult<BookDto>> FilterBookPurchasedBookByUserAsync(string email,int page ,int size);
+        Task<PaginatedResult<BookDto>> FilterTypeBookAsync(int id,int page ,int size);
+        
     }
 }

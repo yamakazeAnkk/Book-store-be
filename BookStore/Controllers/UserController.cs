@@ -16,7 +16,7 @@ namespace BookStore.Controllers
     [ApiController]
     
     [Route("api/[controller]")]
-    [Authorize(Roles = "user")]
+    
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService; 
@@ -31,6 +31,7 @@ namespace BookStore.Controllers
             return Ok(pageUsers);
         } 
         [HttpGet("user")]
+        [Authorize(Roles = "user")]
         public async Task<IActionResult> GetUser()
         {
             var emailUser = User.FindFirst(ClaimTypes.Email)?.Value;

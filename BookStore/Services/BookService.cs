@@ -24,15 +24,21 @@ namespace BookStore.Services
         private readonly IFileUploadService _fileUploadService;
         private readonly IBrandRepository _brandRepository;
 
+        private readonly IOrderItemRepository _orderItemRepository;
+        private readonly IUserRepository _userRepository;
+
         private readonly IHubContext<NotificationHub> _hubContext;
 
-        public BookService(IHubContext<NotificationHub> hubContext,IFileUploadService fileUploadService, IBookRepository bookRepository, IMapper mapper, FirebaseStorageService firebaseStorageService,IBrandRepository brandRepository){
+        public BookService(IHubContext<NotificationHub> hubContext,IUserRepository userRepository,IOrderItemRepository orderItemRepository,IFileUploadService fileUploadService, IBookRepository bookRepository, IMapper mapper, FirebaseStorageService firebaseStorageService,IBrandRepository brandRepository){
             _bookRepository = bookRepository;
             _mapper = mapper;
             _firebaseStorageService = firebaseStorageService;
             _brandRepository = brandRepository;
             _fileUploadService = fileUploadService;
             _hubContext = hubContext;
+            _orderItemRepository = orderItemRepository;
+            _userRepository = userRepository;
+            
        
         }
        public async Task<Book> AddBookAsync(CreateBookDto bookDto, UploadFilesDto filesDto)
@@ -229,6 +235,46 @@ namespace BookStore.Services
         public async Task UpdateIsSaleBookAsync(int id)
         {
             await _bookRepository.UpdateIsSaleBookAsync(id);
+        }
+
+        public async Task<IEnumerable<BookDto>> GetBestSellerAsync(int bestCount)
+        {
+            var bestSellers = await _orderItemRepository.GetBestSellersAsync();
+
+            return bestSellers
+                .Take(bestCount)
+                .Select(pc => new BookDto
+                {
+                    BookId = pc.Book.BookId,
+                    Title = pc.Book.Title,
+                    AuthorName = pc.Book.AuthorName,
+                    Image = pc.Book.Image,
+                    Price = pc.Book.Price,
+                    Rating = pc.Book.Rating,
+                    
+                });
+        }
+
+        public async Task<PaginatedResult<BookDto>> FilterBookPurchasedBookByUserAsync(string email, int page, int size)
+        {
+            var user = await _userRepository.GetUserByEmailAsync(email);
+            if(user == null){
+                throw new Exception("User not found");
+            }
+            var books = await _bookRepository.FilterBookPurchasedBookByUserAsync(user.UserId,page,size);
+            var bookDtos = _mapper.Map<IEnumerable<BookDto>>(books.Items);
+
+ 
+            return new PaginatedResult<BookDto>(bookDtos, books.TotalCount, size);
+        }
+
+        public async Task<PaginatedResult<BookDto>> FilterTypeBookAsync(int id, int page, int size)
+        {
+            var books = await _bookRepository.FilterTypeBookAsync(id,page,size);
+            var bookDtos = _mapper.Map<IEnumerable<BookDto>>(books.Items);
+
+ 
+            return new PaginatedResult<BookDto>(bookDtos, books.TotalCount, size);
         }
     }
 }

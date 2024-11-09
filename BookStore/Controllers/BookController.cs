@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using BookStore.DTOs;
 using BookStore.Models;
@@ -26,7 +27,7 @@ namespace BookStore.Controllers
         }
         
         // Phân trang
-        [Authorize(Roles = "user")]
+        // [Authorize(Roles = "user")]
         [HttpGet]
         public async Task<IActionResult> GetBooksPaged(int pageNumber = 1, int pageSize = 10)
         {
@@ -180,6 +181,12 @@ namespace BookStore.Controllers
             var books = await _bookService.GetLatestBooksAsync(latestCount);
             return Ok(books);
         }
+        [HttpGet("best-seller")]
+        public async Task<IActionResult> GetBestSeller(int bestCount = 5)
+        {
+            var books = await _bookService.GetBestSellerAsync(bestCount);
+            return Ok(books);
+        }
 
         [HttpPost("upload")]
         public async Task<IActionResult> UploadImage(IFormFile imageFile)
@@ -215,6 +222,27 @@ namespace BookStore.Controllers
             await _bookService.UpdateIsSaleBookAsync(id);
             return Ok();
         }
+        [HttpGet("type-book")]
+        public async Task<IActionResult> GetTypeBook(int id,int page = 1, int size = 10){
+            var books = await _bookService.FilterTypeBookAsync(id,page, size);
+            
+
+            return Ok(books);
+        }
+        [Authorize(Roles = "user")]
+        [HttpGet("purchased-book")]
+        public async Task<IActionResult> GetPurchasedBook(int page = 1,int size =10){
+            var emailUser = User.FindFirst(ClaimTypes.Email)?.Value;
+            if (string.IsNullOrEmpty(emailUser))
+                    return Unauthorized("User not authenticated");
+            var orders = await _bookService.FilterBookPurchasedBookByUserAsync(emailUser, page, size);
+            if (orders == null || !orders.Items.Any())
+                return NotFound(new { message = "No recent orders found for this user" });
+
+            return Ok(orders);
+        }
+        
+
 
 
     }
