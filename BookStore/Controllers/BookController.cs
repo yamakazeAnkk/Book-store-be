@@ -210,6 +210,11 @@ namespace BookStore.Controllers
                 return StatusCode(500, $"Lỗi khi tải file lên: {ex.Message}");
             }
         }
+        [HttpPut("delete")]
+        public async Task<IActionResult> DeteleIsSale(int id){
+            await _bookService.UpdateIsSaleBookAsync(id);
+            return Ok();
+        }
 
 
     }

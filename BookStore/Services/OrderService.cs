@@ -88,15 +88,9 @@ namespace BookStore.Services
                         voucherUser.IsUsed = 0; 
                         await _voucherUserRepository.UpdateVoucherUserAsync(voucherUser);
                     }
-                    else
-                    {
-                        throw new Exception("Voucher is already used or invalid for this user.");
-                    }
+                    
                 }
-                else
-                {
-                    throw new Exception("Invalid or expired voucher code.");
-                }
+               
             }
             order.TotalAmount = totalAmount;
             await _orderRepository.AddOrderAsync(order);

@@ -71,6 +71,11 @@ namespace BookStore.Services
             
         }
 
+        public async Task UpdateIsActionUserAsync(int id)
+        {
+            await _userRepository.UpdateIsActionUserAsync(id);
+        }
+
         public async Task UpdateUserAsync(int id, CreateUserDetailDto createUserDetailDto)
         {
             var user = await _userRepository.GetUserByIdAsync(id);

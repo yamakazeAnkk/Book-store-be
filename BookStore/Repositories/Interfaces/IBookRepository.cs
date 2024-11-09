@@ -39,6 +39,8 @@ namespace BookStore.Repositories.Interfaces
         Task<IEnumerable<Book>> GetTopBooksAsync(int topCount);
 
         Task<IEnumerable<Book>> GetLatestBooksAsync(int latestCount);
+
+        Task UpdateIsSaleBookAsync(int id);
         
     }
 }

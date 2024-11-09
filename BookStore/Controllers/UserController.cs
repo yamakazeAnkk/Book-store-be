@@ -54,6 +54,12 @@ namespace BookStore.Controllers
                 return NotFound(ex.Message); 
             }
         } 
+        [HttpPut("delete")]
+        public async Task<IActionResult> UpdateIsActionUser(int id)
+        {
+            await _userService.UpdateIsActionUserAsync(id);
+            return Ok();
+        } 
         
     }
 

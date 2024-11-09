@@ -16,6 +16,10 @@ namespace BookStore.DTOs
 
         public string AuthorName { get; set; }
 
+        public int IsSale { get; set; }
+
+        public decimal? Rating { get; set; }
+
         public List<string> BrandNames { get; set; }
     }
 

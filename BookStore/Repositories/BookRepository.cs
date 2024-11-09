@@ -122,7 +122,7 @@ namespace BookStore.Repositories
         public async Task<IEnumerable<Book>> GetLatestBooksAsync(int latestCount)
         {
             return await _bookStoreContext.Books
-            .Where(b => b.IsSale == 1)                   
+                             
             .OrderByDescending(b => b.UploadDate)        
             .Take(latestCount)                           
             .ToListAsync();
@@ -169,7 +169,7 @@ namespace BookStore.Repositories
         public async Task<IEnumerable<Book>> GetTopBooksAsync(int topCount)
         {
             return await _bookStoreContext.Books
-            .Where(b => b.IsSale == 1 && b.Rating.HasValue)
+            .Where(b => b.Rating.HasValue)
             .OrderByDescending(b => b.Rating)               
             .Take(topCount)                                 
             .ToListAsync();
@@ -240,11 +240,22 @@ namespace BookStore.Repositories
             
             if(entry.State == EntityState.Detached){
                 _bookStoreContext.Books.Attach(book);
-                // entry.State = EntityState.Modified;
+              
             }
             entry.Property(b => b.UploadDate).IsModified = true;
             await _bookStoreContext.SaveChangesAsync();
 
+        }
+
+        public async Task UpdateIsSaleBookAsync(int id)
+        {
+            var book = await _bookStoreContext.Books.FindAsync(id);
+            if(book != null){
+                book.IsSale = 0;
+                await _bookStoreContext.SaveChangesAsync();
+            }else{
+                throw new Exception("Book not found");
+            }
         }
     }
 }  

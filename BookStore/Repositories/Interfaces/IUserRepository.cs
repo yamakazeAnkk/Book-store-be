@@ -27,6 +27,8 @@ namespace BookStore.Repositories.Interfaces
 
         Task UpdateUserByAsync(User user);
 
+        Task UpdateIsActionUserAsync(int id);
+
 
         
 

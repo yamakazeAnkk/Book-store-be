@@ -225,5 +225,10 @@ namespace BookStore.Services
             var book = await _bookRepository.GetLatestBooksAsync(latestCount);
             return _mapper.Map<IEnumerable<BookDto>>(book);
         }
+
+        public async Task UpdateIsSaleBookAsync(int id)
+        {
+            await _bookRepository.UpdateIsSaleBookAsync(id);
+        }
     }
 }

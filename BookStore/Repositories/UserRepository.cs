@@ -19,6 +19,7 @@ namespace BookStore.Repositories
         }
         public async Task AddUserAsync(User user)
         {
+            user.IsActive = 1;
             await _bookStoreContext.Users.AddAsync(user);
         }
 
@@ -54,6 +55,15 @@ namespace BookStore.Repositories
         public async Task<bool> SaveChangeAsync()
         {
             return await _bookStoreContext.SaveChangesAsync() > 0;
+        }
+
+        public async Task UpdateIsActionUserAsync(int id)
+        {
+            var user = await GetUserByIdAsync(id);
+            if(user != null){
+                user.IsActive = 0;
+                await _bookStoreContext.SaveChangesAsync();
+            }
         }
 
         public async Task UpdateUserByAsync(User user)

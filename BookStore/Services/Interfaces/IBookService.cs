@@ -16,7 +16,7 @@ namespace BookStore.Services.Interfaces
         Task UpdateBookAsync(int id,CreateBookDto bookDto,UploadFilesDto filesDto);
         Task DeleteBookAsync(int bookId);
 
-
+        Task UpdateIsSaleBookAsync(int id);
 
         Task CheckBookQuantityAndNotifyAsync();
         Task<PaginatedResult<BookDto>> GetLowStockBooksAsync(int page, int size);
