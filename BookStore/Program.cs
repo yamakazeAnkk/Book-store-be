@@ -118,6 +118,8 @@ builder.Services.AddScoped<IQuantityService,QuantityService>();
 
 builder.Services.AddScoped<IFileUploadService,FileUploadService>();
 
+builder.Services.AddScoped<IPurchasedEbookRepository,PurchasedEbookRepository>();
+
 // sign up service Authentication and jwt 
 builder.Services.AddAuthentication(option => {
     option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

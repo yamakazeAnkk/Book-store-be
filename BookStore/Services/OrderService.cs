@@ -27,6 +27,7 @@ namespace BookStore.Services
 
         private readonly IVoucherRepository _voucherRepository;
 
+        private readonly IPurchasedEbookRepository _purchasedEbookRepository;
         private readonly IVoucherUserRepository _voucherUserRepository;
         public OrderService(
             IOrderItemRepository orderItemRepository, 
@@ -36,7 +37,8 @@ namespace BookStore.Services
             ICartItemRepository cartItemRepository,
             IUserRepository userRepository,
             IVoucherUserRepository voucherUserRepository,
-            IVoucherRepository voucherRepository
+            IVoucherRepository voucherRepository,
+            IPurchasedEbookRepository purchasedEbookRepository
             ){
             _orderRepository = orderRepository;
             _mapper = mapper;
@@ -46,6 +48,7 @@ namespace BookStore.Services
             _orderItemRepository = orderItemRepository;
             _voucherRepository = voucherRepository;
             _voucherUserRepository = voucherUserRepository;
+            _purchasedEbookRepository = purchasedEbookRepository;
         }
         public async Task CheckoutAsync(CreateOrderDto createOrderDto, string emailUser)
         {
@@ -65,8 +68,24 @@ namespace BookStore.Services
             foreach (var cartItem in cartItems)
             {
                 var book = await _bookRepository.GetBookByIdAsync(cartItem.BookId);
-                book.Quantity -= cartItem.Quantity;
-                await _bookRepository.UpdateBookAsync(book);
+                if (book.TypeBookId == 1)
+                {
+                    // Nếu loại sách là 1, trừ Quantity
+                    book.Quantity -= cartItem.Quantity;
+                    await _bookRepository.UpdateBookAsync(book);
+                }
+                else if (book.TypeBookId == 2)
+                {
+                    // Nếu loại sách là 2, lưu vào bảng PurchasedEbook mà không trừ Quantity
+                    var purchasedEbook = new PurchasedEbook
+                    {
+                        UserId = currentUser.UserId,
+                        BookId = book.BookId,
+                        PurchaseDate = DateTime.UtcNow
+                    };
+                    await _purchasedEbookRepository.AddPurchasedEbookAsync(purchasedEbook);
+                }
+                
                 var orderItems = new OrderItem{
                     BookId = cartItem.BookId,
                     Quantity = cartItem.Quantity,

@@ -16,15 +16,15 @@ namespace BookStore.DTOs
         public List<int> brandId { get; set; }
         
         public decimal Price { get; set; }
-        public int Quantity { get; set; }
+        // public int Quantity { get; set; }
 
         public int? TypeBookId { get; set; }
 
         public int IsSale { get; set; }
 
-        public string? Description { get; set; }
+        // public string? Description { get; set; }
 
-        public string? Ebook { get ; set; }
+        // public string? Ebook { get ; set; }
 
         public decimal? Rating { get; set; }
 
