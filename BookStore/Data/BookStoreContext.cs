@@ -35,7 +35,7 @@ namespace BookStore.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Server=localhost;Database=BookStore;User Id=sa;Password=binhanvy1.;Trusted_Connection=False;TrustServerCertificate=True");
+                optionsBuilder.UseSqlServer("Server=localhost;Database=BookStore;User Id=sa;password=binhanvy1.;Trusted_Connection=False;TrustServerCertificate=True");
             }
         }
 
@@ -49,28 +49,29 @@ namespace BookStore.Models
 
                 entity.Property(e => e.AuthorName)
                     .HasMaxLength(255)
-                    .IsUnicode(false)
                     .HasColumnName("author_name");
 
-                entity.Property(e => e.Description)
-                    .HasColumnType("text")
-                    .HasColumnName("description");
+                entity.Property(e => e.Description).HasColumnName("description");
 
                 entity.Property(e => e.Image)
                     .HasMaxLength(1024)
-                    .IsUnicode(false)
                     .HasColumnName("image");
+
+                entity.Property(e => e.IsSale)
+                    .HasColumnName("is_sale")
+                    .HasDefaultValueSql("((1))");
 
                 entity.Property(e => e.LinkEbook)
                     .HasMaxLength(1024)
-                    .IsUnicode(false)
                     .HasColumnName("link_ebook");
 
                 entity.Property(e => e.Price)
                     .HasColumnType("decimal(10, 2)")
                     .HasColumnName("price");
 
-                entity.Property(e => e.Quantity).HasColumnName("quantity");
+                entity.Property(e => e.Quantity)
+                    .HasColumnName("quantity")
+                    .HasDefaultValueSql("((1))");
 
                 entity.Property(e => e.Rating)
                     .HasColumnType("decimal(3, 2)")
@@ -78,7 +79,6 @@ namespace BookStore.Models
 
                 entity.Property(e => e.Title)
                     .HasMaxLength(255)
-                    .IsUnicode(false)
                     .HasColumnName("title");
 
                 entity.Property(e => e.TypeBookId).HasColumnName("type_book_id");
@@ -90,7 +90,7 @@ namespace BookStore.Models
                 entity.HasOne(d => d.TypeBook)
                     .WithMany(p => p.Books)
                     .HasForeignKey(d => d.TypeBookId)
-                    .HasConstraintName("FK__Book__type_book___534D60F1");
+                    .HasConstraintName("FK__Book__type_book___5629CD9C");
             });
 
             modelBuilder.Entity<BookBrand>(entity =>
@@ -106,12 +106,12 @@ namespace BookStore.Models
                 entity.HasOne(d => d.Band)
                     .WithMany(p => p.BookBrands)
                     .HasForeignKey(d => d.BandId)
-                    .HasConstraintName("FK__BookBrand__band___5535A963");
+                    .HasConstraintName("FK__BookBrand__band___5812160E");
 
                 entity.HasOne(d => d.Book)
                     .WithMany(p => p.BookBrands)
                     .HasForeignKey(d => d.BookId)
-                    .HasConstraintName("FK__BookBrand__book___5441852A");
+                    .HasConstraintName("FK__BookBrand__book___571DF1D5");
             });
 
             modelBuilder.Entity<Brand>(entity =>
@@ -120,9 +120,12 @@ namespace BookStore.Models
 
                 entity.Property(e => e.BrandId).HasColumnName("brand_id");
 
+                entity.Property(e => e.Image)
+                    .HasMaxLength(1024)
+                    .HasColumnName("image");
+
                 entity.Property(e => e.Name)
                     .HasMaxLength(255)
-                    .IsUnicode(false)
                     .HasColumnName("name");
             });
 
@@ -143,12 +146,12 @@ namespace BookStore.Models
                 entity.HasOne(d => d.Book)
                     .WithMany(p => p.CartItems)
                     .HasForeignKey(d => d.BookId)
-                    .HasConstraintName("FK__CartItem__book_i__5BE2A6F2");
+                    .HasConstraintName("FK__CartItem__book_i__5EBF139D");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.CartItems)
                     .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("FK__CartItem__user_i__5AEE82B9");
+                    .HasConstraintName("FK__CartItem__user_i__5DCAEF64");
             });
 
             modelBuilder.Entity<Order>(entity =>
@@ -157,13 +160,10 @@ namespace BookStore.Models
 
                 entity.Property(e => e.OrderId).HasColumnName("order_id");
 
-                entity.Property(e => e.Address)
-                    .HasColumnType("text")
-                    .HasColumnName("address");
+                entity.Property(e => e.Address).HasColumnName("address");
 
                 entity.Property(e => e.Name)
                     .HasMaxLength(255)
-                    .IsUnicode(false)
                     .HasColumnName("name");
 
                 entity.Property(e => e.OrderDate)
@@ -177,7 +177,6 @@ namespace BookStore.Models
 
                 entity.Property(e => e.Status)
                     .HasMaxLength(50)
-                    .IsUnicode(false)
                     .HasColumnName("status");
 
                 entity.Property(e => e.TotalAmount)
@@ -190,7 +189,7 @@ namespace BookStore.Models
                     .WithMany(p => p.Orders)
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Order__user_id__5629CD9C");
+                    .HasConstraintName("FK__Order__user_id__59063A47");
             });
 
             modelBuilder.Entity<OrderItem>(entity =>
@@ -208,12 +207,12 @@ namespace BookStore.Models
                 entity.HasOne(d => d.Book)
                     .WithMany(p => p.OrderItems)
                     .HasForeignKey(d => d.BookId)
-                    .HasConstraintName("FK__OrderItem__book___5812160E");
+                    .HasConstraintName("FK__OrderItem__book___5AEE82B9");
 
                 entity.HasOne(d => d.Order)
                     .WithMany(p => p.OrderItems)
                     .HasForeignKey(d => d.OrderId)
-                    .HasConstraintName("FK__OrderItem__order__571DF1D5");
+                    .HasConstraintName("FK__OrderItem__order__59FA5E80");
             });
 
             modelBuilder.Entity<PurchasedEbook>(entity =>
@@ -233,12 +232,12 @@ namespace BookStore.Models
                 entity.HasOne(d => d.Book)
                     .WithMany(p => p.PurchasedEbooks)
                     .HasForeignKey(d => d.BookId)
-                    .HasConstraintName("FK__Purchased__book___5DCAEF64");
+                    .HasConstraintName("FK__Purchased__book___60A75C0F");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.PurchasedEbooks)
                     .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("FK__Purchased__user___5CD6CB2B");
+                    .HasConstraintName("FK__Purchased__user___5FB337D6");
             });
 
             modelBuilder.Entity<Review>(entity =>
@@ -249,9 +248,7 @@ namespace BookStore.Models
 
                 entity.Property(e => e.BookId).HasColumnName("book_id");
 
-                entity.Property(e => e.Comment)
-                    .HasColumnType("text")
-                    .HasColumnName("comment");
+                entity.Property(e => e.Comment).HasColumnName("comment");
 
                 entity.Property(e => e.Rating)
                     .HasColumnType("decimal(3, 2)")
@@ -262,12 +259,12 @@ namespace BookStore.Models
                 entity.HasOne(d => d.Book)
                     .WithMany(p => p.Reviews)
                     .HasForeignKey(d => d.BookId)
-                    .HasConstraintName("FK__Review__book_id__59FA5E80");
+                    .HasConstraintName("FK__Review__book_id__5CD6CB2B");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.Reviews)
                     .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("FK__Review__user_id__59063A47");
+                    .HasConstraintName("FK__Review__user_id__5BE2A6F2");
             });
 
             modelBuilder.Entity<Role>(entity =>
@@ -278,7 +275,6 @@ namespace BookStore.Models
 
                 entity.Property(e => e.RoleName)
                     .HasMaxLength(15)
-                    .IsUnicode(false)
                     .HasColumnName("role_name");
             });
 
@@ -298,17 +294,15 @@ namespace BookStore.Models
             {
                 entity.ToTable("User");
 
-                entity.HasIndex(e => e.Email, "UQ__User__AB6E616412225281")
+                entity.HasIndex(e => e.Email, "UQ__User__AB6E616497EC79CE")
                     .IsUnique();
 
-                entity.HasIndex(e => e.Username, "UQ__User__F3DBC5728539A012")
+                entity.HasIndex(e => e.Username, "UQ__User__F3DBC572B07320AA")
                     .IsUnique();
 
                 entity.Property(e => e.UserId).HasColumnName("user_id");
 
-                entity.Property(e => e.Address)
-                    .HasColumnType("text")
-                    .HasColumnName("address");
+                entity.Property(e => e.Address).HasColumnName("address");
 
                 entity.Property(e => e.Email)
                     .HasMaxLength(100)
@@ -317,8 +311,11 @@ namespace BookStore.Models
 
                 entity.Property(e => e.Fullname)
                     .HasMaxLength(255)
-                    .IsUnicode(false)
                     .HasColumnName("fullname");
+
+                entity.Property(e => e.IsActive)
+                    .HasColumnName("is_active")
+                    .HasDefaultValueSql("((1))");
 
                 entity.Property(e => e.Password)
                     .HasMaxLength(255)
@@ -332,20 +329,18 @@ namespace BookStore.Models
 
                 entity.Property(e => e.ProfileImage)
                     .HasMaxLength(1024)
-                    .IsUnicode(false)
                     .HasColumnName("profile_image");
 
                 entity.Property(e => e.RoleId).HasColumnName("role_id");
 
                 entity.Property(e => e.Username)
                     .HasMaxLength(50)
-                    .IsUnicode(false)
                     .HasColumnName("username");
 
                 entity.HasOne(d => d.Role)
                     .WithMany(p => p.Users)
                     .HasForeignKey(d => d.RoleId)
-                    .HasConstraintName("FK__User__role_id__52593CB8");
+                    .HasConstraintName("FK__User__role_id__5535A963");
             });
 
             modelBuilder.Entity<Voucher>(entity =>
@@ -366,9 +361,7 @@ namespace BookStore.Models
                     .HasColumnType("decimal(10, 2)")
                     .HasColumnName("min_cost");
 
-                entity.Property(e => e.Quantity)
-                    .HasColumnName("quantity")
-                    .HasDefaultValueSql("((0))");
+                entity.Property(e => e.Quantity).HasColumnName("quantity");
 
                 entity.Property(e => e.ReleaseDate)
                     .HasColumnType("datetime")
@@ -397,12 +390,12 @@ namespace BookStore.Models
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.VoucherUsers)
                     .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("FK__VoucherUs__user___5FB337D6");
+                    .HasConstraintName("FK__VoucherUs__user___628FA481");
 
                 entity.HasOne(d => d.Voucher)
                     .WithMany(p => p.VoucherUsers)
                     .HasForeignKey(d => d.VoucherId)
-                    .HasConstraintName("FK__VoucherUs__vouch__5EBF139D");
+                    .HasConstraintName("FK__VoucherUs__vouch__619B8048");
             });
 
             OnModelCreatingPartial(modelBuilder);

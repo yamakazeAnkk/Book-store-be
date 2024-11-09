@@ -32,6 +32,8 @@ namespace BookStore.Services.Interfaces
         Task<PaginatedResult<OrderDetailDto>> SearchOrdersByNameAsync(string name, int page, int size);
 
         Task<PaginatedResult<OrderDetailDto>> SearchOrdersByDateAsync(int month, int year, int page, int size);
+
+        Task<PaginatedResult<OrderDetailDto>> SearchOrderAllAsync(string? name ,string? status, int? year , int? month, int page, int size);
         
     }
 }

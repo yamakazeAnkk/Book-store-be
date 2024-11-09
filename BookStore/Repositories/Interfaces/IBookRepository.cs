@@ -26,13 +26,19 @@ namespace BookStore.Repositories.Interfaces
         Task<PaginatedResult<Book>> GetLowStockBooksAsync(int page ,int size);
         Task<PaginatedResult<Book>> GetStagnantBooksAsync(int page ,int size);
         
-       
+        Task ClearBookBrandsAsync(int bookId);
+        
+        Task AddBrandsToBookAsync(int bookId,List<int> brandIds);
 
         Task<PaginatedResult<Book>> SearchBooksByTitleAsync(string title, int page, int size);
         Task<PaginatedResult<Book>> FilterBooksByBrandAsync(List<int> brandIds, int page, int size);
         Task<PaginatedResult<Book>> SortBooksByPriceAsync(decimal min, decimal max, int page, int size);
 
         Task<PaginatedResult<Book>> SearchAllBookAsync(string title,List<int> brandIds,int page, int size);
+
+        Task<IEnumerable<Book>> GetTopBooksAsync(int topCount);
+
+        Task<IEnumerable<Book>> GetLatestBooksAsync(int latestCount);
         
     }
 }

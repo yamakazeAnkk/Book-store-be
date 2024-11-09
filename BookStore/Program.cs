@@ -28,7 +28,9 @@ builder.Services.AddControllers()
     {
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
         options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
-    });
+    })
+    
+    ;
 
 builder.Services.AddControllers()
     .AddNewtonsoftJson(options =>
@@ -150,7 +152,7 @@ builder.Services.AddAuthentication(option => {
 });
 
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddCors(p => p.AddPolicy("MyCors", build =>
+builder.Services.AddCors(p => p.AddPolicy("AllowAllOrigins", build =>
 {
     build.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
 }));
@@ -170,7 +172,7 @@ if (app.Environment.IsDevelopment())
 
 
 app.MapHub<NotificationHub>("/notificationHub");
-app.UseCors("MyCors");
+app.UseCors("AllowAllOrigins");
 
 app.UseAuthentication();
 app.UseAuthorization();

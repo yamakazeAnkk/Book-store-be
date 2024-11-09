@@ -47,38 +47,13 @@ namespace BookStore.Helper
             }
 
             // Check if the method has an additional "BookJson" or "UserJson" parameter
-            var bookJsonParam = context.MethodInfo.GetParameters()
-                .FirstOrDefault(p => p.Name.Equals("bookJson", StringComparison.OrdinalIgnoreCase) && p.ParameterType == typeof(string));
+      
 
             var userJsonParam = context.MethodInfo.GetParameters()
                 .FirstOrDefault(p => p.Name.Equals("userJson", StringComparison.OrdinalIgnoreCase) && p.ParameterType == typeof(string));
 
-            if (bookJsonParam != null)
-            {
-                // Add the BookJson schema properties if present
-                schema.Properties.Add("BookJson", new OpenApiSchema
-                {
-                    Type = "object",
-                    Properties = new Dictionary<string, OpenApiSchema>
-                    {
-                        ["title"] = new OpenApiSchema { Type = "string" },
-                        ["brandId"] = new OpenApiSchema 
-                        {
-                            Type = "array", 
-                            Items = new OpenApiSchema { Type = "integer", Format = "int32" }
-                        },
-                        ["price"] = new OpenApiSchema { Type = "number", Format = "decimal" },
-                        ["quantity"] = new OpenApiSchema { Type = "integer", Format = "int32" },
-                        ["Description"] = new OpenApiSchema { Type = "string" },
-                        ["typeBookId"] = new OpenApiSchema { Type = "integer", Format = "int32", Nullable = true },
-                        ["author_name"] = new OpenApiSchema { Type = "string" } 
-                    },
-                    Required = new HashSet<string> { "title", "brandId", "price", "quantity","author_name" }
-                });
-                
-                schema.Required = new HashSet<string> { "imageFile", "BookJson" };
-            }
-            else if (userJsonParam != null)
+            
+            if (userJsonParam != null)
             {
                 // Add the UserDto schema properties under the key "UserJson"
                 schema.Properties.Add("UserJson", new OpenApiSchema

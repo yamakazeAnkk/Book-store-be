@@ -9,7 +9,7 @@ namespace BookStore.DTOs
     public class UploadFilesDto
     {
         [FromForm(Name = "ImageFile")]
-        public IFormFile ImageFile { get; set; }
+        public IFormFile? ImageFile { get; set; }
         
         [FromForm(Name = "EbookFile")]
         public IFormFile? EbookFile { get; set; }

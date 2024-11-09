@@ -225,8 +225,11 @@ namespace BookStore.Services
             return await _orderRepository.GetTotalRevenueByYearAsync(year);
         }
 
-    
-
-       
+        public async Task<PaginatedResult<OrderDetailDto>> SearchOrderAllAsync(string? name, string? status, int? year, int? month, int page, int size)
+        {
+            var orders =  await _orderRepository.SearchAllOrderAsync(name,month,year,status,page,size);
+            var orderDto = _mapper.Map<IEnumerable<OrderDetailDto>>(orders);
+            return new PaginatedResult<OrderDetailDto>(orderDto, orders.TotalCount, size);
+        }
     }
 }

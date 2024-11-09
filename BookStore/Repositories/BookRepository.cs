@@ -24,10 +24,10 @@ namespace BookStore.Repositories
         {
             if (book.UploadDate == DateTime.MinValue)
             {
-                book.UploadDate = DateTime.Now;  // Hoặc bạn có thể đặt một ngày cụ thể hợp lệ
+                book.UploadDate = DateTime.Now; 
             }
 
-            
+            book.IsSale = 1;
             await _bookStoreContext.Books.AddAsync(book);
             await _bookStoreContext.SaveChangesAsync();
 
@@ -39,6 +39,27 @@ namespace BookStore.Repositories
         public async Task AddBookBrandAsync(List<BookBrand> bookBrand)
         {
              _bookStoreContext.BookBrands.AddRangeAsync(bookBrand);
+            await _bookStoreContext.SaveChangesAsync();
+        }
+
+        public async Task AddBrandsToBookAsync(int bookId, List<int> brandIds)
+        {
+            if(brandIds == null || !brandIds.Any())
+                return ;
+            
+            foreach (var branId in brandIds)
+            {
+                _bookStoreContext.BookBrands.Add(new BookBrand {BookId = bookId, BandId = branId});
+            }
+            await _bookStoreContext.SaveChangesAsync();
+
+        }
+
+        public async Task ClearBookBrandsAsync(int bookId)
+        {
+            var bookBrand = _bookStoreContext.BookBrands.Where(c => c.BookId == bookId).ToList();
+
+            _bookStoreContext.BookBrands.RemoveRange(bookBrand);
             await _bookStoreContext.SaveChangesAsync();
         }
 
@@ -98,6 +119,15 @@ namespace BookStore.Repositories
             return new PaginatedResult<Book>(books, totalCount, pageSize);
         }
 
+        public async Task<IEnumerable<Book>> GetLatestBooksAsync(int latestCount)
+        {
+            return await _bookStoreContext.Books
+            .Where(b => b.IsSale == 1)                   
+            .OrderByDescending(b => b.UploadDate)        
+            .Take(latestCount)                           
+            .ToListAsync();
+        }
+
         public async Task<PaginatedResult<Book>> GetLowStockBooksAsync(int page, int size)
         {
             var query = _bookStoreContext.Books
@@ -134,6 +164,15 @@ namespace BookStore.Repositories
                 .ToListAsync();
 
             return new PaginatedResult<Book>(stagnantBooks, totalCount, size);
+        }
+
+        public async Task<IEnumerable<Book>> GetTopBooksAsync(int topCount)
+        {
+            return await _bookStoreContext.Books
+            .Where(b => b.IsSale == 1 && b.Rating.HasValue)
+            .OrderByDescending(b => b.Rating)               
+            .Take(topCount)                                 
+            .ToListAsync();
         }
 
         public async Task<PaginatedResult<Book>> SearchAllBookAsync(string title, List<int> brandIds, int page, int size)
@@ -196,12 +235,14 @@ namespace BookStore.Repositories
         public async Task UpdateBookAsync(Book book)
         {
             book.UploadDate = DateTime.Now;
+            
             var entry = _bookStoreContext.Entry(book);
             
             if(entry.State == EntityState.Detached){
                 _bookStoreContext.Books.Attach(book);
-                entry.State = EntityState.Modified;
+                // entry.State = EntityState.Modified;
             }
+            entry.Property(b => b.UploadDate).IsModified = true;
             await _bookStoreContext.SaveChangesAsync();
 
         }

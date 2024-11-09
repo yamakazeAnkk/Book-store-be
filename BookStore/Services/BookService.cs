@@ -153,6 +153,13 @@ namespace BookStore.Services
                 book.LinkEbook = await _fileUploadService.UploadEbookAsync(files.EbookFile);
             }
             _mapper.Map(bookDto,book);
+            if (string.IsNullOrEmpty(book.AuthorName))
+            {
+                book.AuthorName = "Unknown Author"; // hoặc một giá trị mặc định phù hợp
+            }
+         
+            await _bookRepository.ClearBookBrandsAsync(id);
+            await _bookRepository.AddBrandsToBookAsync(id,bookDto.brandId);
 
             await _bookRepository.UpdateBookAsync(book);
         }
@@ -205,6 +212,18 @@ namespace BookStore.Services
 
  
             return new PaginatedResult<BookDto>(bookDtos, books.TotalCount, size);
+        }
+
+        public async Task<IEnumerable<BookDto>> GetTopBooksAsync(int topCount)
+        {
+            var book = await _bookRepository.GetTopBooksAsync(topCount);
+            return _mapper.Map<IEnumerable<BookDto>>(book);
+        }
+
+        public async Task<IEnumerable<BookDto>> GetLatestBooksAsync(int latestCount)
+        {
+            var book = await _bookRepository.GetLatestBooksAsync(latestCount);
+            return _mapper.Map<IEnumerable<BookDto>>(book);
         }
     }
 }

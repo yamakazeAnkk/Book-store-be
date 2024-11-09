@@ -25,6 +25,7 @@ namespace BookStore.Models
         public string? Description { get; set; }
         public decimal? Rating { get; set; }
         public string? LinkEbook { get; set; }
+        public int IsSale { get; set; }
 
         public virtual TypeBook? TypeBook { get; set; }
         public virtual ICollection<BookBrand> BookBrands { get; set; }

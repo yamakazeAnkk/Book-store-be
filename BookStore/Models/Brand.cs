@@ -12,6 +12,7 @@ namespace BookStore.Models
 
         public int BrandId { get; set; }
         public string Name { get; set; } = null!;
+        public string? Image { get; set; }
 
         public virtual ICollection<BookBrand> BookBrands { get; set; }
     }

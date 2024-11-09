@@ -22,6 +22,7 @@ namespace BookStore.Models
         public string Phone { get; set; } = null!;
         public string Fullname { get; set; } = null!;
         public string? Address { get; set; }
+        public int IsActive { get; set; }
         public int? RoleId { get; set; }
 
         public virtual Role? Role { get; set; }

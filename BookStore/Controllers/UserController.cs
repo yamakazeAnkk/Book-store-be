@@ -40,6 +40,7 @@ namespace BookStore.Controllers
             var user = await _userService.GetUserByEmailAsync(emailUser);
             return Ok(user);
         } 
+       
         [HttpPut]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] CreateUserDetailDto createUserDetailDto)
         {

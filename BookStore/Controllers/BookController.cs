@@ -167,6 +167,19 @@ namespace BookStore.Controllers
             await _bookService.DeleteBookAsync(id);
             return Ok("Book deleted successfully.");
         }
+        [HttpGet("top-books")]
+        public async Task<IActionResult> GetTopBooks(int topCount = 5)
+        {
+            var books = await _bookService.GetTopBooksAsync(topCount);
+            return Ok(books);
+        }
+
+        [HttpGet("latest-books")]
+        public async Task<IActionResult> GetLatestBooks(int latestCount = 5)
+        {
+            var books = await _bookService.GetLatestBooksAsync(latestCount);
+            return Ok(books);
+        }
 
         [HttpPost("upload")]
         public async Task<IActionResult> UploadImage(IFormFile imageFile)

@@ -27,6 +27,7 @@ namespace BookStore.Services.Interfaces
 
         Task<PaginatedResult<BookDto>> SortBooksByPriceAsync(decimal min, decimal max, int page, int size);
 
-        
+        Task<IEnumerable<BookDto>> GetTopBooksAsync(int topCount);
+        Task<IEnumerable<BookDto>> GetLatestBooksAsync(int latestCount);
     }
 }

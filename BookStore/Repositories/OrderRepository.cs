@@ -142,9 +142,27 @@ namespace BookStore.Repositories
                 .SumAsync(o => o.TotalAmount);
         }
 
-        public Task<PaginatedResult<Order>> SearchAllOrderAsync(string name, string month, string state, int page, int size)
+        public async Task<PaginatedResult<Order>> SearchAllOrderAsync(string? name, int? month, int? year, string? state, int page, int size)
         {
-            throw new NotImplementedException();
+            var query = _context.Orders.AsQueryable();
+            if (!string.IsNullOrEmpty(name)){
+                query = query.Where(b => b.Status.ToLower() == state.ToLower());
+            }
+            if(month.HasValue ){
+                query = query.Where(b => b.OrderDate.Month == month.Value);
+            }
+            if(year.HasValue){
+                query = query.Where(b => b.OrderDate.Year == year.Value);
+            }
+            if(!string.IsNullOrEmpty(name)){
+                query = query.Where(b => b.Name.ToLower() == name.ToLower());
+            }
+            int totalCount = await query.CountAsync();
+            
+            var order = await query.Include(o => o.OrderItems).Skip((page - 1) *size).Take(size).ToListAsync();
+
+            return new PaginatedResult<Order>(order,totalCount,size);
+            
         }
 
         public async Task<PaginatedResult<Order>> SearchOrdersByDateAsync(int month, int year, int page, int size)

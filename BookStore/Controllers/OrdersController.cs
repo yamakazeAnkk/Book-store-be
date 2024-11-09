@@ -79,6 +79,11 @@ namespace BookStore.Controllers
                 return StatusCode(500, new { message = ex.Message });
             }
         }
+         [HttpGet("search")]
+        public async Task<IActionResult> SearchOrderAll(string? name , string status, int? year, int? month, int page = 1 , int size = 10){
+            var order = await _orderService.SearchOrderAllAsync(name , status,month,year,page,size);
+            return Ok(order);
+        }
         
         
 
