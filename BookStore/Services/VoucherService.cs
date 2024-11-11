@@ -72,6 +72,7 @@ namespace BookStore.Services
                 ReleaseDate = createVoucherDto.ReleaseDate,
                 ExpiredDate = createVoucherDto.ExpiredDate,
                 MinCost = createVoucherDto.MinCost,
+                Quantity = createVoucherDto.Quantity,
                 Discount = createVoucherDto.Discount
             };
 

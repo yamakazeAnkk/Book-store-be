@@ -80,8 +80,14 @@ namespace BookStore.Controllers
             }
         }
          [HttpGet("search")]
-        public async Task<IActionResult> SearchOrderAll(string? name , string status, int? year, int? month, int page = 1 , int size = 10){
-            var order = await _orderService.SearchOrderAllAsync(name , status,month,year,page,size);
+        public async Task<IActionResult> SearchOrderAll(string? name , string? status, int? year, int? month, int page = 1 , int size = 10){
+            var filterOrderDto = new FilterOrderDto{
+                Name = name,
+                Status = status,
+                Year = year,
+                Month = month,
+            };
+            var order = await _orderService.SearchOrderAllAsync(filterOrderDto,page,size);
             return Ok(order);
         }
         

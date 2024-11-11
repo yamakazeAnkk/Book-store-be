@@ -71,6 +71,8 @@ namespace BookStore.Services
             var cartItem = await _cartItemRepository.GetCartItemByUserAndProductAsync(int.Parse(userId),cartItemId);
             if (cartItem != null){
                 await _cartItemRepository.DeleteCartItemAsync(cartItem);
+            }else{
+                 throw new KeyNotFoundException("Cart item not found for the specified user and product");
             }
 
         }
@@ -158,6 +160,7 @@ namespace BookStore.Services
 
         private CartItemDto MaptoDTO(CartItem cartItem){
             var cartItemDto = new CartItemDto{
+               
                 quantity = cartItem.Quantity,
                 total = cartItem.Quantity * cartItem.Book.Price,
                 bookDto = _mapper.Map<BookDto>(cartItem.Book)

@@ -7,6 +7,7 @@ namespace BookStore.DTOs
 {
     public class CartItemDto
     {
+       
         public int quantity {get ; set;}
 
         public decimal total { get ; set ;}

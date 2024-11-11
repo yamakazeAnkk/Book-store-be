@@ -13,5 +13,10 @@ namespace BookStore.DTOs
         public DateTime ExpiredDate { get; set; }
         public decimal MinCost { get; set; }
         public decimal Discount { get; set; }
+        public int? Quantity { get; set; }
+
+        
+
+
     }
 }

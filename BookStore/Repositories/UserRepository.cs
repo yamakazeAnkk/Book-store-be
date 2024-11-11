@@ -6,6 +6,7 @@ using BookStore.DTOs;
 using BookStore.Helper;
 using BookStore.Models;
 using BookStore.Repositories.Interfaces;
+using Google.Api.Gax;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookStore.Repositories
@@ -21,6 +22,32 @@ namespace BookStore.Repositories
         {
             user.IsActive = 1;
             await _bookStoreContext.Users.AddAsync(user);
+        }
+
+        public async Task<PaginatedResult<User>> FilterByUserAsync(FilterUserDto filterUserDto,int page,int size)
+        {
+           
+
+            var query = _bookStoreContext.Users.AsQueryable();
+
+            if(!string.IsNullOrEmpty(filterUserDto.Fullname)){
+                 query = query.Where(u => u.Fullname.Contains(filterUserDto.Fullname));
+            }
+            if (!string.IsNullOrEmpty(filterUserDto.Phone))
+            {
+                query = query.Where(u => u.Phone.Contains(filterUserDto.Phone));
+            }
+            if (!string.IsNullOrEmpty(filterUserDto.Email))
+            {
+                query = query.Where(u => u.Email.Contains(filterUserDto.Email));
+            }
+            var totalCount = await query.CountAsync();
+
+            var user = await query.Skip((page - 1) * size).Take(size).ToListAsync();
+
+            return new PaginatedResult<User>(user,totalCount,size);
+
+
         }
 
         public async Task<PaginatedResult<User>> GetAllUserAsync(int page, int size)

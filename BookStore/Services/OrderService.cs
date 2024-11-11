@@ -103,7 +103,7 @@ namespace BookStore.Services
                     if (voucherUser != null && voucherUser.IsUsed != 0)
                     {
                         decimal discount = Math.Min(voucher.Discount, totalAmount);
-                        totalAmount -= discount;
+                        totalAmount *= (1 - discount);
                         voucherUser.IsUsed = 0; 
                         await _voucherUserRepository.UpdateVoucherUserAsync(voucherUser);
                     }
@@ -238,11 +238,13 @@ namespace BookStore.Services
             return await _orderRepository.GetTotalRevenueByYearAsync(year);
         }
 
-        public async Task<PaginatedResult<OrderDetailDto>> SearchOrderAllAsync(string? name, string? status, int? year, int? month, int page, int size)
+        public async Task<PaginatedResult<OrderDetailDto>> SearchOrderAllAsync(FilterOrderDto filterOrderDto, int page, int size)
         {
-            var orders =  await _orderRepository.SearchAllOrderAsync(name,month,year,status,page,size);
-            var orderDto = _mapper.Map<IEnumerable<OrderDetailDto>>(orders);
+            var orders =  await _orderRepository.SearchAllOrderAsync(filterOrderDto,page,size);
+            var orderDto = _mapper.Map<IEnumerable<OrderDetailDto>>(orders.Items);
             return new PaginatedResult<OrderDetailDto>(orderDto, orders.TotalCount, size);
         }
+
+        
     }
 }

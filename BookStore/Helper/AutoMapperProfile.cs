@@ -42,7 +42,8 @@ namespace BookStore.Helper
             CreateMap<CartItem,CartItemDto>()
                 .ForMember(dest =>dest.quantity , opt => opt.MapFrom(src => src.Quantity))
                 .ForMember(dest => dest.total, otp => otp.MapFrom(src => src.Quantity * src.Book.Price) )
-                .ForMember(dest => dest.bookDto , otp => otp.MapFrom(src => src.Book)).ReverseMap();
+                .ForMember(dest => dest.bookDto , otp => otp.MapFrom(src => src.Book))
+                .ReverseMap();
             
             CreateMap<Order,OrderDto>().ForMember(dest => dest.OrderItems,opt => opt.MapFrom(src => src.OrderItems)).ReverseMap();
             CreateMap<OrderItem, OrderItemDto>().ForMember(dest => dest.BooksDto, opt => opt.MapFrom(src => src.Book)).ReverseMap();

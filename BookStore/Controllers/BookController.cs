@@ -217,9 +217,16 @@ namespace BookStore.Controllers
                 return StatusCode(500, $"Lỗi khi tải file lên: {ex.Message}");
             }
         }
-        [HttpPut("delete")]
-        public async Task<IActionResult> DeteleIsSale(int id){
-            await _bookService.UpdateIsSaleBookAsync(id);
+        [HttpPut("hidden")]
+        public async Task<IActionResult> HiddenBook(int id){
+            int isSale =  0;
+            await _bookService.UpdateIsSaleBookAsync(id,isSale);
+            return Ok();
+        }
+        [HttpPut("visible")]
+        public async Task<IActionResult> Visible(int id){
+             int isSale =  1;
+            await _bookService.UpdateIsSaleBookAsync(id,isSale);
             return Ok();
         }
         [HttpGet("type-book")]

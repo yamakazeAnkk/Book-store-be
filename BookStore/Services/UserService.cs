@@ -24,6 +24,14 @@ namespace BookStore.Services
             _mapper = mapper;
         }
 
+        public async Task<PaginatedResult<UserDetailDto>> FilterByUserAsync(FilterUserDto filterUserDto, int page, int size)
+        {
+            var user = await _userRepository.FilterByUserAsync(filterUserDto,page,size);
+            var  userDto = _mapper.Map<IEnumerable<UserDetailDto>>(user.Items);
+
+            return new PaginatedResult<UserDetailDto>(userDto,user.TotalCount,size);
+        }
+
         public async Task<PaginatedResult<UserDetailDto>> GetUserAllAsync(int page, int size)
         {
             

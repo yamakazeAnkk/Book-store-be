@@ -15,6 +15,8 @@ namespace BookStore.DTOs
         public string? Name { get; set; }
         public string? Phone { get; set; }
         public string? Address { get; set; }
+
+        public string Status { get; set; } = null!;
         public List<OrderItemDto> OrderItems { get; set; } = new List<OrderItemDto>();
     }
 }

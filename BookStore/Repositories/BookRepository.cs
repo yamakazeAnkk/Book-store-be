@@ -279,11 +279,11 @@ namespace BookStore.Repositories
 
         }
 
-        public async Task UpdateIsSaleBookAsync(int id)
+        public async Task UpdateIsSaleBookAsync(int id,int isSale)
         {
             var book = await _bookStoreContext.Books.FindAsync(id);
             if(book != null){
-                book.IsSale = 0;
+                book.IsSale = isSale;
                 await _bookStoreContext.SaveChangesAsync();
             }else{
                 throw new Exception("Book not found");

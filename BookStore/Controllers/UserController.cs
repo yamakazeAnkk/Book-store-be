@@ -24,10 +24,22 @@ namespace BookStore.Controllers
         public UserController(IUserService userService ){
             _userService = userService;
         }
-        [HttpGet]
+        [HttpGet("all-user")]
         public async Task<IActionResult> GetAllUserPaged(int pageNumber = 1, int pageSize = 10)
         {
             var pageUsers =  await _userService.GetUserAllAsync(pageNumber, pageSize);
+            return Ok(pageUsers);
+        } 
+        [HttpGet("filter-user")]
+        public async Task<IActionResult> FilterUser([FromQuery] string? Fullname, [FromQuery] string? Email, [FromQuery] string? Phone,int pageNumber = 1, int pageSize = 10)
+        {
+            var filterUserDto = new FilterUserDto
+            {
+                Fullname = Fullname,
+                Email = Email,
+                Phone = Phone
+            };
+            var pageUsers =  await _userService.FilterByUserAsync(filterUserDto,pageNumber, pageSize);
             return Ok(pageUsers);
         } 
         [HttpGet("user")]

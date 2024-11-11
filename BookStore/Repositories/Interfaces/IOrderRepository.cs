@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BookStore.DTOs;
 using BookStore.Helper;
 using BookStore.Models;
 using Google.Api.Gax;
@@ -30,7 +31,7 @@ namespace BookStore.Repositories.Interfaces
 
         Task<PaginatedResult<Order>> GetRecentOrdersByUserIdAsync(int userId, int page, int size);
 
-        Task<PaginatedResult<Order>> SearchAllOrderAsync(string? name,int? month,int? year, string? state,int page ,int size);
+        Task<PaginatedResult<Order>> SearchAllOrderAsync(FilterOrderDto filterOrderDto,int page ,int size);
         
     }
 }

@@ -142,20 +142,27 @@ namespace BookStore.Repositories
                 .SumAsync(o => o.TotalAmount);
         }
 
-        public async Task<PaginatedResult<Order>> SearchAllOrderAsync(string? name, int? month, int? year, string? state, int page, int size)
+        public async Task<PaginatedResult<Order>> SearchAllOrderAsync(FilterOrderDto filterOrderDto,int page, int size)
         {
             var query = _context.Orders.AsQueryable();
-            if (!string.IsNullOrEmpty(name)){
-                query = query.Where(b => b.Status.ToLower() == state.ToLower());
+            if (!string.IsNullOrEmpty(filterOrderDto.Status))
+            {
+                query = query.Where(b => b.Status.ToLower() == filterOrderDto.Status.ToLower());
             }
-            if(month.HasValue ){
-                query = query.Where(b => b.OrderDate.Month == month.Value);
+
+            if (filterOrderDto.Month.HasValue)
+            {
+                query = query.Where(b => b.OrderDate.Month == filterOrderDto.Month.Value);
             }
-            if(year.HasValue){
-                query = query.Where(b => b.OrderDate.Year == year.Value);
+
+            if (filterOrderDto.Year.HasValue)
+            {
+                query = query.Where(b => b.OrderDate.Year == filterOrderDto.Year.Value);
             }
-            if(!string.IsNullOrEmpty(name)){
-                query = query.Where(b => b.Name.ToLower() == name.ToLower());
+
+            if (!string.IsNullOrEmpty(filterOrderDto.Name))
+            {
+                query = query.Where(b => b.Name.ToLower().Contains(filterOrderDto.Name.ToLower()));
             }
             int totalCount = await query.CountAsync();
             

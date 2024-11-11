@@ -232,9 +232,9 @@ namespace BookStore.Services
             return _mapper.Map<IEnumerable<BookDto>>(book);
         }
 
-        public async Task UpdateIsSaleBookAsync(int id)
+        public async Task UpdateIsSaleBookAsync(int id,int isSale)
         {
-            await _bookRepository.UpdateIsSaleBookAsync(id);
+            await _bookRepository.UpdateIsSaleBookAsync(id,isSale);
         }
 
         public async Task<IEnumerable<BookDto>> GetBestSellerAsync(int bestCount)
