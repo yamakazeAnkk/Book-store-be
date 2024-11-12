@@ -36,6 +36,7 @@ namespace BookStore.Helper
             CreateMap<CartItem,CartItemDto>().ReverseMap();
 
             CreateMap<Book,CreateBookDto>().ReverseMap();
+            CreateMap<PurchasedBookDto,Book>().ReverseMap();
             CreateMap<Book,BookDetailsDto>().ForMember(dest => dest.BrandNames, opt => opt.MapFrom(src => src.BookBrands.Select(bb => bb.Band != null ? bb.Band.Name : string.Empty).ToList())).ReverseMap();
             
 
@@ -57,8 +58,8 @@ namespace BookStore.Helper
             CreateMap<Review, ReviewDetailDto>()
             .ForMember(dest => dest.Comment, opt => opt.MapFrom(src => src.Comment))
             .ForMember(dest => dest.Rating, opt => opt.MapFrom(src => src.Rating))
-            .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.User != null ? src.User.Fullname : "Anonymous"))
-            .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User != null ? src.User.Email : "N/A"))
+            .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.User != null ? src.User.Username : "Anonymous"))
+            // .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User != null ? src.User.Email : "N/A"))
             .ForMember(dest => dest.Avatar, opt => opt.MapFrom(src => src.User != null ? src.User.ProfileImage : "default-avatar.png"))
             .ReverseMap();
 

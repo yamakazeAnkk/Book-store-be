@@ -30,6 +30,7 @@ namespace BookStore.Repositories
         public async Task<IEnumerable<ProductCount>> GetBestSellersAsync()
         {
             return await _context.OrderItems
+                
                 .Include(oi => oi.Book) 
                 .GroupBy(od => od.BookId)
                 .Select(g => new ProductCount

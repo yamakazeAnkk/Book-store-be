@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace BookStore.DTOs
 {
@@ -23,7 +24,7 @@ namespace BookStore.DTOs
 
         public decimal? Rating { get; set; }
         public string? Description { get; set; }
-
+        [JsonProperty("author_name")]
         public string AuthorName { get; set; }
 
         public List<string> BrandNames { get; set; }

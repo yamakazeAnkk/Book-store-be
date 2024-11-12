@@ -17,6 +17,12 @@ namespace BookStore.Repositories
 
         public async Task AddReviewAsync(Review review)
         {
+            bool hasBook = await _context.OrderItems.AnyAsync(oi => oi.BookId == review.BookId && oi.Order.UserId == review.UserId );
+            if (!hasBook)
+            {
+                throw new InvalidOperationException("User cannot review a book they have not purchased.");
+            }
+
             _context.Reviews.Add(review);
             await _context.SaveChangesAsync();
         }

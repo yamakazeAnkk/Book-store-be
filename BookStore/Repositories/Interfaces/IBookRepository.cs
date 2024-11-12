@@ -30,7 +30,7 @@ namespace BookStore.Repositories.Interfaces
         
         Task AddBrandsToBookAsync(int bookId,List<int> brandIds);
 
-        Task<PaginatedResult<Book>> SearchBooksByTitleAsync(string title, int page, int size);
+        Task<PaginatedResult<Book>> SearchBooksByTitleAsync(string? title, int page, int size);
         Task<PaginatedResult<Book>> FilterBooksByBrandAsync(List<int> brandIds, int page, int size);
         Task<PaginatedResult<Book>> SortBooksByPriceAsync(decimal min, decimal max, int page, int size);
 

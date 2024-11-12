@@ -100,11 +100,11 @@ namespace BookStore.Services
                 if (voucher != null && voucher.ExpiredDate >= DateTime.UtcNow && totalAmount >= voucher.MinCost)
                 {
                     var voucherUser = await _voucherUserRepository.GetVoucherByUserAndVoucherIdAsync(currentUser.UserId, voucher.VoucherId);
-                    if (voucherUser != null && voucherUser.IsUsed != 0)
+                    if (voucherUser != null && voucherUser.IsUsed == 0)
                     {
                         decimal discount = Math.Min(voucher.Discount, totalAmount);
                         totalAmount *= (1 - discount);
-                        voucherUser.IsUsed = 0; 
+                        voucherUser.IsUsed = 1; 
                         await _voucherUserRepository.UpdateVoucherUserAsync(voucherUser);
                     }
                     

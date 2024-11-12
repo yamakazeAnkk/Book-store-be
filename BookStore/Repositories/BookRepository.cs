@@ -154,7 +154,7 @@ namespace BookStore.Repositories
         public async Task<IEnumerable<Book>> GetLatestBooksAsync(int latestCount)
         {
             return await _bookStoreContext.Books
-                             
+            .Where(b => b.IsSale == 1)
             .OrderByDescending(b => b.UploadDate)        
             .Take(latestCount)                           
             .ToListAsync();
@@ -201,7 +201,7 @@ namespace BookStore.Repositories
         public async Task<IEnumerable<Book>> GetTopBooksAsync(int topCount)
         {
             return await _bookStoreContext.Books
-            .Where(b => b.Rating.HasValue)
+            .Where(b => b.IsSale == 1  && b.Rating.HasValue)
             .OrderByDescending(b => b.Rating)               
             .Take(topCount)                                 
             .ToListAsync();
@@ -233,13 +233,18 @@ namespace BookStore.Repositories
             return new PaginatedResult<Book>(books,totalCount,size);
         }
 
-        public async Task<PaginatedResult<Book>> SearchBooksByTitleAsync(string searchTerm, int page, int size)
+        public async Task<PaginatedResult<Book>> SearchBooksByTitleAsync(string? searchTerm, int page, int size)
         {
-            int totalCount = await _bookStoreContext.Books
-                .CountAsync(b => EF.Functions.Like(b.Title, $"%{searchTerm}%") || EF.Functions.Like(b.AuthorName, $"%{searchTerm}%"));
+            var query = _bookStoreContext.Books.Where(b => b.IsSale == 1);
+            
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                query = query.Where(b => EF.Functions.Like(b.Title, $"%{searchTerm}%") || EF.Functions.Like(b.AuthorName, $"%{searchTerm}%"));
+            }
+            int totalCount = await query.CountAsync();
 
-            var books = await _bookStoreContext.Books
-                .Where(b => EF.Functions.Like(b.Title, $"%{searchTerm}%") || EF.Functions.Like(b.AuthorName, $"%{searchTerm}%"))
+            var books = await query
+              
                 .OrderBy(b => b.Title)
                 .Skip((page - 1) * size)
                 .Take(size)

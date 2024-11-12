@@ -21,7 +21,7 @@ namespace BookStore.Services.Interfaces
         Task CheckBookQuantityAndNotifyAsync();
         Task<PaginatedResult<BookDto>> GetLowStockBooksAsync(int page, int size);
         Task<PaginatedResult<BookDto>> GetStagnantBooksAsync(int page, int size);
-        Task<PaginatedResult<BookDto>> SearchBooksByTitleAsync(string title, int page, int size);
+        Task<PaginatedResult<BookDto>> SearchBooksByTitleAsync(string? title, int page, int size);
         Task<PaginatedResult<BookDto>> SearchAllBooksAsync(string title,List<int> brandIds, int page, int size);
         Task<PaginatedResult<BookDto>> FilterBooksByBrandAsync(List<int> brandIds, int page, int size);
 
@@ -32,7 +32,7 @@ namespace BookStore.Services.Interfaces
 
         Task<IEnumerable<BookDto>> GetBestSellerAsync(int bestCount);
 
-        Task<PaginatedResult<BookDto>> FilterBookPurchasedBookByUserAsync(string email,int page ,int size);
+        Task<PaginatedResult<PurchasedBookDto>> FilterBookPurchasedBookByUserAsync(string email,int page ,int size);
         Task<PaginatedResult<BookDto>> FilterTypeBookAsync(int id,int page ,int size);
         
     }

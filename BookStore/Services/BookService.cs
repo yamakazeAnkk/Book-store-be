@@ -123,7 +123,7 @@ namespace BookStore.Services
             return new PaginatedResult<BookDetailsDto>(bookDtos, books.TotalCount, pageSize);
         }
 
-        public async Task<PaginatedResult<BookDto>> SearchBooksByTitleAsync(string title, int page, int size)
+        public async Task<PaginatedResult<BookDto>> SearchBooksByTitleAsync(string? title, int page, int size)
         {
             var books = await _bookRepository.SearchBooksByTitleAsync(title,page,size);
             var bookDtos = _mapper.Map<IEnumerable<BookDto>>(books.Items);
@@ -242,6 +242,7 @@ namespace BookStore.Services
             var bestSellers = await _orderItemRepository.GetBestSellersAsync();
 
             return bestSellers
+                .Where( x => x.Book.IsSale == 1)
                 .Take(bestCount)
                 .Select(pc => new BookDto
                 {
@@ -250,22 +251,24 @@ namespace BookStore.Services
                     AuthorName = pc.Book.AuthorName,
                     Image = pc.Book.Image,
                     Price = pc.Book.Price,
+                    IsSale = pc.Book.IsSale,
                     Rating = pc.Book.Rating,
+                    TypeBookId = pc.Book.TypeBookId,
                     
                 });
         }
 
-        public async Task<PaginatedResult<BookDto>> FilterBookPurchasedBookByUserAsync(string email, int page, int size)
+        public async Task<PaginatedResult<PurchasedBookDto>> FilterBookPurchasedBookByUserAsync(string email, int page, int size)
         {
             var user = await _userRepository.GetUserByEmailAsync(email);
             if(user == null){
                 throw new Exception("User not found");
             }
             var books = await _bookRepository.FilterBookPurchasedBookByUserAsync(user.UserId,page,size);
-            var bookDtos = _mapper.Map<IEnumerable<BookDto>>(books.Items);
+            var bookDtos = _mapper.Map<IEnumerable<PurchasedBookDto>>(books.Items);
 
  
-            return new PaginatedResult<BookDto>(bookDtos, books.TotalCount, size);
+            return new PaginatedResult<PurchasedBookDto>(bookDtos, books.TotalCount, size);
         }
 
         public async Task<PaginatedResult<BookDto>> FilterTypeBookAsync(int id, int page, int size)

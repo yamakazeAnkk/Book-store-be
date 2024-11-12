@@ -18,6 +18,8 @@ namespace BookStore.Services.Interfaces
         Task<IEnumerable<VoucherDto>> GetAllVouchersAsync();
         Task<IEnumerable<VoucherDto>> GetAllVouchersByUserAsync(string username);
         Task DeleteVoucherAsync(int voucherId); 
+        Task<IEnumerable<VoucherDto>> GetAllVouchersOfUserAsync();
+       
 
 
     }

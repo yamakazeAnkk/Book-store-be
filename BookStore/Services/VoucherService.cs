@@ -126,6 +126,10 @@ namespace BookStore.Services
             
         }
 
-      
+        public async Task<IEnumerable<VoucherDto>> GetAllVouchersOfUserAsync()
+        {
+            var voucher =  await _voucherRepository.GetAllVoucherOfUserAsync();
+            return _mapper.Map<IEnumerable<VoucherDto>>(voucher);
+        }
     }
 }

@@ -79,7 +79,18 @@ namespace BookStore.Services
             {
                 return new List<ReviewDetailDto>();
             }
-            return _mapper.Map<List<ReviewDetailDto>>(reviews);
+            var reviewDetails = reviews.Select(review => new ReviewDetailDto{
+                Comment = review.Comment,
+                Username = review.User?.Username,
+                // Email = review.User?.Email,
+                Avatar = review.User?.ProfileImage,
+                Rating = RoundToNearestHalf(review.Rating)
+            }).ToList();
+            return reviewDetails;
+        }
+        private decimal RoundToNearestHalf(decimal rating)
+        {
+            return Math.Round(rating * 2, MidpointRounding.AwayFromZero) / 2;
         }
 
         public async Task<ReviewDto> FindByIdAsync(int id)

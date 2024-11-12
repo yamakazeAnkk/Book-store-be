@@ -67,6 +67,11 @@ namespace BookStore.Controllers
             var voucher = await _voucherService.GetAllVouchersAsync();
             return Ok(voucher);
         }
+        [HttpGet("of-mobile")]
+        public async Task<IActionResult> GetAllVoucherOfUser(){
+            var voucher = await _voucherService.GetAllVouchersOfUserAsync();
+            return Ok(voucher);
+        }
         [HttpGet("user")]
         public async Task<IActionResult> GetAllVoucherByUser(){
             var emailUser = User.FindFirst(ClaimTypes.Email)?.Value;
