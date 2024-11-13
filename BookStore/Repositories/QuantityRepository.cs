@@ -21,14 +21,15 @@ namespace BookStore.Repositories
             var bookCount = await _bookStoreContext.Books.CountAsync();
             var orderCount = await _bookStoreContext.Orders.CountAsync();
             var userCount = await _bookStoreContext.Users.CountAsync();
-            var totalOrderAmount = await _bookStoreContext.Orders.SumAsync(o => o.TotalAmount);
-
+            var totalOrderAmount = await _bookStoreContext.Orders.Where(u => u.Status.ToUpper() == "Completed").SumAsync(o => o.TotalAmount);
+            var reviewCount = await _bookStoreContext.Reviews.CountAsync();
             return new DashboardStatisticsDto
             {
                 BookCount = bookCount,
                 OrderCount = orderCount,
                 UserCount = userCount,
-                TotalOrderAmount = totalOrderAmount
+                TotalOrderAmount = totalOrderAmount,
+                ReviewCount = reviewCount
             };
         }
     }

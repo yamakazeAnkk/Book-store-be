@@ -67,10 +67,18 @@ namespace BookStore.Controllers
                 return NotFound(ex.Message); 
             }
         } 
-        [HttpPut("delete")]
-        public async Task<IActionResult> UpdateIsActionUser(int id)
+        [HttpPut("hidden")]
+        public async Task<IActionResult> UpdateHiddenUser(int id)
         {
-            await _userService.UpdateIsActionUserAsync(id);
+            int isAction = 1;
+            await _userService.UpdateIsActionUserAsync(id,isAction);
+            return Ok();
+        } 
+        [HttpPut("visible")]
+        public async Task<IActionResult> UpdateVisibleUser(int id)
+        {
+            int isAction = 0;
+            await _userService.UpdateIsActionUserAsync(id,isAction);
             return Ok();
         } 
         

@@ -43,7 +43,7 @@ namespace BookStore.Repositories
             }
             var totalCount = await query.CountAsync();
 
-            var user = await query.Skip((page - 1) * size).Take(size).ToListAsync();
+            var user = await query.Where(u => u.RoleId != 1).Skip((page - 1) * size).Take(size).ToListAsync();
 
             return new PaginatedResult<User>(user,totalCount,size);
 
@@ -84,11 +84,11 @@ namespace BookStore.Repositories
             return await _bookStoreContext.SaveChangesAsync() > 0;
         }
 
-        public async Task UpdateIsActionUserAsync(int id)
+        public async Task UpdateIsActionUserAsync(int id,int isActive)
         {
             var user = await GetUserByIdAsync(id);
             if(user != null){
-                user.IsActive = 0;
+                user.IsActive = isActive;
                 await _bookStoreContext.SaveChangesAsync();
             }
         }

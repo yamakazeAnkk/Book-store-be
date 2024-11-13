@@ -14,7 +14,7 @@ namespace BookStore.Services.Interfaces
 
         Task<User> LoginUserAsync(LoginDto loginDto);
 
-        Task UpdateIsActionUserAsync(int id);
+        Task UpdateIsActionUserAsync(int id,int isAction);
 
         Task<User> GetUserByEmailAsync(string email);
 

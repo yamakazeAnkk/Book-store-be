@@ -79,9 +79,9 @@ namespace BookStore.Services
             
         }
 
-        public async Task UpdateIsActionUserAsync(int id)
+        public async Task UpdateIsActionUserAsync(int id,int isAction)
         {
-            await _userRepository.UpdateIsActionUserAsync(id);
+            await _userRepository.UpdateIsActionUserAsync(id,isAction);
         }
 
         public async Task UpdateUserAsync(int id, CreateUserDetailDto createUserDetailDto)

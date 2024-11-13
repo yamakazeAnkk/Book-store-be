@@ -11,5 +11,7 @@ namespace BookStore.DTOs
         public int OrderCount { get; set; }
         public int UserCount { get; set; }
         public decimal TotalOrderAmount { get; set; }
+
+        public int ReviewCount { get; set; }
     }
 }

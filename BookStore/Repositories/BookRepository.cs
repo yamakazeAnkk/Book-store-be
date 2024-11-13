@@ -182,15 +182,18 @@ namespace BookStore.Repositories
 
             var query = _bookStoreContext.Books
                 .Where(b =>
-                    (b.UploadDate <= threeMonthsAgo) || // 3 tháng từ ngày upload
-                    !b.OrderItems.Any() || // Sách chưa từng được order
-                    b.OrderItems.Max(oi => oi.Order.OrderDate) <= threeMonthsAgo // 3 tháng từ lần order gần nhất
+                    // 3 tháng từ ngày upload
+                    (b.UploadDate <= threeMonthsAgo) || 
+                    // Sách chưa từng được order
+                    !b.OrderItems.Any() || 
+                    // Trong OrderItems quá 3 tháng
+                    b.OrderItems.Max(oi => oi.Order.OrderDate) <= threeMonthsAgo 
                 );
 
             int totalCount = await query.CountAsync();
 
             var stagnantBooks = await query
-                .OrderBy(b => b.Title) // Có thể thay đổi để sắp xếp theo thuộc tính khác
+                .OrderBy(b => b.Title) 
                 .Skip((page - 1) * size)
                 .Take(size)
                 .ToListAsync();

@@ -27,7 +27,7 @@ namespace BookStore.Repositories.Interfaces
 
         Task UpdateUserByAsync(User user);
 
-        Task UpdateIsActionUserAsync(int id);
+        Task UpdateIsActionUserAsync(int id,int isAction);
 
 
         Task <PaginatedResult<User>> FilterByUserAsync(FilterUserDto filterUserDto,int page,int size);
