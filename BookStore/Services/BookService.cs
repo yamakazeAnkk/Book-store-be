@@ -242,7 +242,7 @@ namespace BookStore.Services
             var bestSellers = await _orderItemRepository.GetBestSellersAsync();
 
             return bestSellers
-                .Where( x => x.Book.IsSale == 1)
+                .Where( x => x.Book.IsSale == 1 && x.Book.Quantity > 0)
                 .Take(bestCount)
                 .Select(pc => new BookDto
                 {
@@ -250,6 +250,7 @@ namespace BookStore.Services
                     Title = pc.Book.Title,
                     AuthorName = pc.Book.AuthorName,
                     Image = pc.Book.Image,
+                    
                     Price = pc.Book.Price,
                     IsSale = pc.Book.IsSale,
                     Rating = pc.Book.Rating,

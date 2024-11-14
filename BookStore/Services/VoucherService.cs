@@ -54,7 +54,7 @@ namespace BookStore.Services
             {
                 UserId = userId,
                 VoucherId = voucher.VoucherId,
-                IsUsed = 1 
+                IsUsed = 0 
             };
             
             voucher.Quantity = (byte?)Math.Max(0, voucher.Quantity.GetValueOrDefault() - 1);
@@ -126,9 +126,13 @@ namespace BookStore.Services
             
         }
 
-        public async Task<IEnumerable<VoucherDto>> GetAllVouchersOfUserAsync()
+        public async Task<IEnumerable<VoucherDto>> GetAllVouchersOfUserAsync(string username)
         {
-            var voucher =  await _voucherRepository.GetAllVoucherOfUserAsync();
+            var user = await _userRepository.GetUserByEmailAsync(username);
+            if(user == null){
+                throw new Exception("User không tồn tại.");
+            }
+            var voucher =  await _voucherRepository.GetAllVoucherOfUserAsync(user.UserId);
             return _mapper.Map<IEnumerable<VoucherDto>>(voucher);
         }
     }

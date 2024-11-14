@@ -77,8 +77,12 @@ namespace BookStore.Helper
 
             CreateMap<Order,OrderStatusDto>().ReverseMap();
 
+            CreateMap<UserPrivateDto,User>().ReverseMap();
+
             CreateMap(typeof(PaginatedResult<>), typeof(PaginatedResult<>))
             .ConvertUsing(typeof(PaginatedResultConverter<,>));
+
+
 
         }       
     }

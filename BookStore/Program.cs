@@ -120,6 +120,11 @@ builder.Services.AddScoped<IFileUploadService,FileUploadService>();
 
 builder.Services.AddScoped<IPurchasedEbookRepository,PurchasedEbookRepository>();
 
+builder.Services.AddScoped<IEmailService,EmailService>();
+
+builder.Services.AddSingleton<Random>();
+
+
 // sign up service Authentication and jwt 
 builder.Services.AddAuthentication(option => {
     option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

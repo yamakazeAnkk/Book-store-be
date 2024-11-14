@@ -9,6 +9,7 @@ using BookStore.Models;
 using BookStore.Repositories;
 using BookStore.Repositories.Interfaces;
 using BookStore.Services.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BookStore.Services
 {
@@ -17,19 +18,33 @@ namespace BookStore.Services
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
 
-        
+        private readonly IEmailService _emailService;
 
-        public UserService(IUserRepository userRepository, IMapper mapper){
+        private readonly Random _random;
+
+        public UserService(IUserRepository userRepository, IMapper mapper, IEmailService emailService, Random random){
             _userRepository = userRepository;
             _mapper = mapper;
+            _random = random;
+            _emailService =  emailService;
         }
 
         public async Task<PaginatedResult<UserDetailDto>> FilterByUserAsync(FilterUserDto filterUserDto, int page, int size)
         {
             var user = await _userRepository.FilterByUserAsync(filterUserDto,page,size);
-            var  userDto = _mapper.Map<IEnumerable<UserDetailDto>>(user.Items);
+            var userDto = _mapper.Map<IEnumerable<UserDetailDto>>(user.Items);
 
             return new PaginatedResult<UserDetailDto>(userDto,user.TotalCount,size);
+        }
+
+        public async Task<string> GenerateAndSendTokenAsync(string email)
+        {
+            var token = _random.Next(100000,999999).ToString();
+            string subject = "Your Verification Token";
+            string body = $"Your verification token is: {token}";
+
+            await _emailService.SendEmailAsync(email,subject,body);
+            return token;
         }
 
         public async Task<PaginatedResult<UserDetailDto>> GetUserAllAsync(int page, int size)
@@ -44,9 +59,12 @@ namespace BookStore.Services
         }
        
 
-        public async Task<User> GetUserByEmailAsync(string email)
+        public async Task<UserPrivateDto> GetUserByEmailAsync(string email)
         {
-            return await _userRepository.GetUserByEmailAsync(email);
+            var user = await _userRepository.GetUserByEmailAsync(email);
+            // _mapper.Map<UserPrivateDto>(user);
+            return _mapper.Map<UserPrivateDto>(user);
+
         }
 
         public async Task<User> LoginUserAsync(LoginDto loginDto)
@@ -55,7 +73,7 @@ namespace BookStore.Services
             var user = await _userRepository.GetUserByNameAsync(loginDto.Username);
             if (user == null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, user.Password))
             {
-                return null; // Invalid login
+                return null;
             }
 
             return user; // Success

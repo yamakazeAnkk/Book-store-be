@@ -70,7 +70,7 @@ namespace BookStore.Controllers
                 var emailUser = User.FindFirst(ClaimTypes.Email)?.Value;
                 if (string.IsNullOrEmpty(emailUser))
                     return Unauthorized("User not authenticated");
-                await _orderService.UpdateStateAsync(id,emailUser);
+                await _orderService.CancelOrderAsync(id,emailUser);
 
                 return Ok(new { message = "Status update successfully." });
             }
@@ -80,9 +80,9 @@ namespace BookStore.Controllers
             }
         }
          [HttpGet("search")]
-        public async Task<IActionResult> SearchOrderAll(string? name , string? status, int? year, int? month, int page = 1 , int size = 10){
+        public async Task<IActionResult> SearchOrderAll(string? phone , string? status, int? year, int? month, int page = 1 , int size = 10){
             var filterOrderDto = new FilterOrderDto{
-                Name = name,
+                Phone = phone,
                 Status = status,
                 Year = year,
                 Month = month,

@@ -14,7 +14,7 @@ namespace BookStore.Repositories.Interfaces
         Task AddVoucherAsync(Voucher voucher);
 
         Task <IEnumerable<Voucher>> GetAllVoucherAsync();
-        Task <IEnumerable<Voucher>> GetAllVoucherOfUserAsync();
+        Task <IEnumerable<Voucher>> GetAllVoucherOfUserAsync(int userId);
 
         Task UpdateVoucherAsync(Voucher voucher);
         Task DeleteVoucherAsync(int voucherId);

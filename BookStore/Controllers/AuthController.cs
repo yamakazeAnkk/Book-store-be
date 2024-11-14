@@ -83,6 +83,12 @@ namespace BookStore.Controllers
             }
         }
 
+        [HttpPost("check-mail")]
+
+        public async Task<IActionResult> CheckMail(string email){
+            string token = await _userService.GenerateAndSendTokenAsync(email);
+            return Ok(new {token} );
+        }
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
@@ -93,6 +99,9 @@ namespace BookStore.Controllers
             }
             if(user.Role == null || string.IsNullOrEmpty(user.Role.RoleName)){
                 return Unauthorized("User role is not defined.");
+            }
+            if(user.IsActive == 0){
+                return BadRequest("Account is either locked or does not exist.");
             }
             var token = _jwtService.GenerateToken(user.UserId.ToString(), user.Role.RoleName,user.Email);
             return Ok(new { Token = token , Username = user.Username, Role = user.Role.RoleName });

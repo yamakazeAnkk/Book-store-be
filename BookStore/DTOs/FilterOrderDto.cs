@@ -7,7 +7,7 @@ namespace BookStore.DTOs
 {
     public class FilterOrderDto
     {
-        public string? Name { get; set; }
+        public string? Phone { get; set; }
 
         public string? Status { get; set; }
 

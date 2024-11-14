@@ -37,9 +37,12 @@ namespace BookStore.Repositories
             return await _context.Vouchers.ToListAsync(); 
         }
 
-        public async Task<IEnumerable<Voucher>> GetAllVoucherOfUserAsync()
+        public async Task<IEnumerable<Voucher>> GetAllVoucherOfUserAsync(int userId)
         {
-            return await _context.Vouchers.Where(x => x.Quantity > 0 && DateTime.UtcNow < x.ExpiredDate ).ToListAsync(); 
+            return await _context.Vouchers
+                .Where(x => x.Quantity > 0 && DateTime.UtcNow < x.ExpiredDate )
+                .Where(x => !x.VoucherUsers.Any(vu => vu.UserId == userId ))
+                .ToListAsync(); 
         }
 
         public async Task<Voucher> GetVoucherByCodeAsync(string voucherCode)

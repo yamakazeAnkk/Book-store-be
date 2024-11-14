@@ -65,14 +65,21 @@ namespace BookStore.Services
                 OrderItems = new List<OrderItem>()
             };
             decimal totalAmount = 0;
+            bool allEbooks = true;
             foreach (var cartItem in cartItems)
             {
                 var book = await _bookRepository.GetBookByIdAsync(cartItem.BookId);
+
+                
                 if (book.TypeBookId == 1)
                 {
                     // Nếu loại sách là 1, trừ Quantity
+                    if(book.Quantity == 0 || book.Quantity < cartItem.Quantity){
+                        throw new Exception($"Not enough stock for the book '{book.Title}'. Requested: {cartItem.Quantity}, Available: {book.Quantity}");
+                    }
                     book.Quantity -= cartItem.Quantity;
                     await _bookRepository.UpdateBookAsync(book);
+                    allEbooks = false;
                 }
                 else if (book.TypeBookId == 2)
                 {
@@ -111,6 +118,7 @@ namespace BookStore.Services
                 }
                
             }
+            order.Status = allEbooks ? "Completed" : "Pending";
             order.TotalAmount = totalAmount;
             await _orderRepository.AddOrderAsync(order);
             await _cartItemRepository.ClearCartItemsByUserIdAsync(currentUser.UserId);

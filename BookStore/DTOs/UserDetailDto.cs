@@ -16,11 +16,5 @@ namespace BookStore.DTOs
 
         public int IsActive { get; set; }
 
-
-
-    
-        
-        
-
     }
 }

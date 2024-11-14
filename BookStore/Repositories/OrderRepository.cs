@@ -160,9 +160,9 @@ namespace BookStore.Repositories
                 query = query.Where(b => b.OrderDate.Year == filterOrderDto.Year.Value);
             }
 
-            if (!string.IsNullOrEmpty(filterOrderDto.Name))
+            if (!string.IsNullOrEmpty(filterOrderDto.Phone))
             {
-                query = query.Where(b => b.Name.ToLower().Contains(filterOrderDto.Name.ToLower()));
+                query = query.Where(b => b.Phone == filterOrderDto.Phone);
             }
             int totalCount = await query.CountAsync();
             

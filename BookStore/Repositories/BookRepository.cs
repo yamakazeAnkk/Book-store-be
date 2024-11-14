@@ -80,11 +80,14 @@ namespace BookStore.Repositories
             .Include(pe => pe.Book)
             .Select(pe => pe.Book)
             .Where(book => book != null)
+            .GroupBy(book => book.BookId)
+            .Select(b => b.First())
             .AsQueryable();
 
             var totalCount = await query.CountAsync();
 
             var books = await query
+            
                 .Skip((page - 1) * size)
                 .Take(size)
                 .ToListAsync();
@@ -95,12 +98,12 @@ namespace BookStore.Repositories
         public async Task<PaginatedResult<Book>> FilterBooksByBrandAsync(List<int> brandIds, int page, int size)
         {
             int totalCount = await _bookStoreContext.BookBrands
-            .Where(bb => brandIds.Contains(bb.BandId.GetValueOrDefault()))
+            .Where(bb => brandIds.Contains(bb.BandId.GetValueOrDefault()) )
             .Select(bb => bb.Book.BookId)
             .Distinct()
             .CountAsync();
             var books=  await _bookStoreContext.BookBrands
-                .Where(bb => brandIds.Contains(bb.BandId.GetValueOrDefault()))
+                .Where(bb => brandIds.Contains(bb.BandId.GetValueOrDefault())  )
                 .Include(bb => bb.Book)
                 .ThenInclude(b => b.BookBrands)
                 .ThenInclude(bb => bb.Band)
@@ -154,7 +157,7 @@ namespace BookStore.Repositories
         public async Task<IEnumerable<Book>> GetLatestBooksAsync(int latestCount)
         {
             return await _bookStoreContext.Books
-            .Where(b => b.IsSale == 1)
+            .Where(b => b.IsSale == 1 )
             .OrderByDescending(b => b.UploadDate)        
             .Take(latestCount)                           
             .ToListAsync();
@@ -168,6 +171,7 @@ namespace BookStore.Repositories
             int totalCount = await query.CountAsync();
 
             var lowStockBooks = await query
+                .Where(b => b.IsSale == 1)
                 .OrderBy(b => b.Title) 
                 .Skip((page - 1) * size)
                 .Take(size)
@@ -188,6 +192,7 @@ namespace BookStore.Repositories
                     !b.OrderItems.Any() || 
                     // Trong OrderItems quá 3 tháng
                     b.OrderItems.Max(oi => oi.Order.OrderDate) <= threeMonthsAgo 
+                    && b.IsSale == 1
                 );
 
             int totalCount = await query.CountAsync();
@@ -204,7 +209,7 @@ namespace BookStore.Repositories
         public async Task<IEnumerable<Book>> GetTopBooksAsync(int topCount)
         {
             return await _bookStoreContext.Books
-            .Where(b => b.IsSale == 1  && b.Rating.HasValue)
+            .Where(b => b.IsSale == 1  && b.Rating.HasValue )
             .OrderByDescending(b => b.Rating)               
             .Take(topCount)                                 
             .ToListAsync();
