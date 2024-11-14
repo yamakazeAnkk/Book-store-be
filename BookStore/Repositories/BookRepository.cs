@@ -76,21 +76,20 @@ namespace BookStore.Repositories
         public async Task<PaginatedResult<Book>> FilterBookPurchasedBookByUserAsync(int id, int page, int size)
         {
             var query = _bookStoreContext.PurchasedEbooks
-            .Where(pe => pe.UserId == id)
-            .Include(pe => pe.Book)
-            .Select(pe => pe.Book)
-            .Where(book => book != null)
-            .GroupBy(book => book.BookId)
-            .Select(b => b.First())
-            .AsQueryable();
+                .Where(pe => pe.UserId == id && pe.Book != null) 
+                .Include(pe => pe.Book)
+                .Select(pe => pe.Book)
+                .AsEnumerable()
+                .GroupBy(book => book.BookId) 
+                .Select(group => group.FirstOrDefault()) 
+                .Where(book => book != null);
 
-            var totalCount = await query.CountAsync();
+            var totalCount =  query.Count();
 
-            var books = await query
-            
+            var books =  query
                 .Skip((page - 1) * size)
                 .Take(size)
-                .ToListAsync();
+                .ToList();
             return new PaginatedResult<Book>(books,totalCount,size);
 
         }
