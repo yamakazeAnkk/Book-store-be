@@ -28,6 +28,8 @@ namespace BookStore.Services
         private readonly IVoucherRepository _voucherRepository;
 
         private readonly IPurchasedEbookRepository _purchasedEbookRepository;
+
+        private readonly IEmailService _emailService;
         private readonly IVoucherUserRepository _voucherUserRepository;
         public OrderService(
             IOrderItemRepository orderItemRepository, 
@@ -38,7 +40,8 @@ namespace BookStore.Services
             IUserRepository userRepository,
             IVoucherUserRepository voucherUserRepository,
             IVoucherRepository voucherRepository,
-            IPurchasedEbookRepository purchasedEbookRepository
+            IPurchasedEbookRepository purchasedEbookRepository,
+            IEmailService emailService
             ){
             _orderRepository = orderRepository;
             _mapper = mapper;
@@ -49,6 +52,7 @@ namespace BookStore.Services
             _voucherRepository = voucherRepository;
             _voucherUserRepository = voucherUserRepository;
             _purchasedEbookRepository = purchasedEbookRepository;
+            _emailService = emailService;
         }
         public async Task CheckoutAsync(CreateOrderDto createOrderDto, string emailUser)
         {
@@ -122,6 +126,20 @@ namespace BookStore.Services
             order.TotalAmount = totalAmount;
             await _orderRepository.AddOrderAsync(order);
             await _cartItemRepository.ClearCartItemsByUserIdAsync(currentUser.UserId);
+            var emailBody = $@"
+            Dear {currentUser.Fullname},
+
+            Thank you for your order! Here are the details:
+            
+            - Total Amount: {order.TotalAmount:000} VNĐ
+            - Status: {order.Status}
+
+            Your order will be processed soon. If you have any questions, feel free to contact us.
+
+            Best regards,
+            BookStore Team";
+
+        await _emailService.SendEmailAsync(currentUser.Email, "Order Confirmation", emailBody);
 
 
         

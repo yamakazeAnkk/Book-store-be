@@ -29,6 +29,7 @@ namespace BookStore.Repositories.Interfaces
 
         Task UpdateIsActionUserAsync(int id,int isAction);
 
+        Task<bool> ChangePasswordAsync(int userId, string newPassword);
 
         Task <PaginatedResult<User>> FilterByUserAsync(FilterUserDto filterUserDto,int page,int size);
 

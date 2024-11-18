@@ -57,6 +57,30 @@ namespace BookStore.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
-
+        [HttpGet("monthly-revenue/{year}")]
+        public async Task<IActionResult> GetMonthlyCompletedRevenue(int year)
+        {
+            try
+            {
+                var monthlyRevenue = await _dashboardService.GetMonthlyCompletedRevenueFor2024Async(year);
+                return Ok(monthlyRevenue);
+            }
+            catch (InvalidOperationException ex)
+            {
+           
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+           
+                return StatusCode(500, new { message = "An unexpected error occurred.", details = ex.Message });
+            }
+        }
+        [HttpGet("revenue/years")]
+        public async Task<IActionResult> GetRevenueByYears(int startYear, int endYear)
+        {
+            var revenue = await _dashboardService.GetTotalRevenueByYearsAsync(startYear, endYear);
+            return Ok(revenue);
+        }
     }
 }

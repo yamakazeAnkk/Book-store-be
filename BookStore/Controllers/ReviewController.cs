@@ -12,7 +12,7 @@ namespace BookStore.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = "user")]
+    
     public class ReviewController : ControllerBase
     {
         private readonly IReviewService _reviewService;
@@ -29,7 +29,8 @@ namespace BookStore.Controllers
 
             return Ok(reviewDto);
         }
-
+        
+        [Authorize(Roles = "user")]
         [HttpPost]
         public async Task<ActionResult> CreateReview([FromForm] CreateReviewDto createReviewDto)
         {
@@ -41,12 +42,12 @@ namespace BookStore.Controllers
             
             return Ok();
         }
-
+        [Authorize(Roles = "user")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateReview(int id, [FromBody] CreateReviewDto createReviewDto)
         {
             await _reviewService.UpdateAsync(id, createReviewDto);
-            return NoContent();
+            return Ok();
         }
         
     }

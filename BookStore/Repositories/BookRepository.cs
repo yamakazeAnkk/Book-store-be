@@ -185,13 +185,12 @@ namespace BookStore.Repositories
 
             var query = _bookStoreContext.Books
                 .Where(b =>
-                    // 3 tháng từ ngày upload
-                    (b.UploadDate <= threeMonthsAgo) || 
+                
                     // Sách chưa từng được order
-                    !b.OrderItems.Any() || 
+                    (!b.OrderItems.Any() && b.UploadDate <= threeMonthsAgo) ||
                     // Trong OrderItems quá 3 tháng
-                    b.OrderItems.Max(oi => oi.Order.OrderDate) <= threeMonthsAgo 
-                    && b.IsSale == 1
+                    (b.OrderItems.Any() && b.OrderItems.Max(oi => oi.Order.OrderDate) <= threeMonthsAgo)
+                  
                 );
 
             int totalCount = await query.CountAsync();

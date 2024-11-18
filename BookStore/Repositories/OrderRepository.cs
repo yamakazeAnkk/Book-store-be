@@ -162,7 +162,7 @@ namespace BookStore.Repositories
 
             if (!string.IsNullOrEmpty(filterOrderDto.Phone))
             {
-                query = query.Where(b => b.Phone == filterOrderDto.Phone);
+                query = query.Where(b => EF.Functions.Like(b.Phone, $"%{filterOrderDto.Phone.Trim()}%"));
             }
             int totalCount = await query.CountAsync();
             

@@ -40,6 +40,7 @@ namespace BookStore.Repositories.Interfaces
 
         Task<IEnumerable<Book>> GetLatestBooksAsync(int latestCount);
 
+
         Task UpdateIsSaleBookAsync(int id,int isSale);
 
         Task<PaginatedResult<Book>> FilterBookPurchasedBookByUserAsync(int id,int page ,int size);

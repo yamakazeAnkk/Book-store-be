@@ -13,7 +13,7 @@ namespace BookStore.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = "user")]
+    
     public class OrdersController : ControllerBase
     {
         private readonly IOrderService _orderService;
@@ -31,6 +31,7 @@ namespace BookStore.Controllers
             var orders = await _orderService.GetOrdersRecentAsync(page, size);
             return Ok(orders);
         }
+        [Authorize(Roles = "user")]
         [HttpGet("user")]
         public async Task<IActionResult> GetRecentOrdersByUser(int page = 1, int size = 10){
             var emailUser = User.FindFirst(ClaimTypes.Email)?.Value;
@@ -63,6 +64,7 @@ namespace BookStore.Controllers
                 return StatusCode(500, new { message = ex.Message });
             }
         }
+        [Authorize(Roles = "user")]
         [HttpPut("cancel-status")]
         public async Task<IActionResult> CancelOrder(int id){
             try
@@ -92,7 +94,7 @@ namespace BookStore.Controllers
         }
         
         
-
+        [Authorize(Roles = "user")]
         [HttpPost("checkout")]
         public async Task<IActionResult> Checkout([FromBody] CreateOrderDto createOrderDto)
         {

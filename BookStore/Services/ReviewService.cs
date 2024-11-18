@@ -101,11 +101,22 @@ namespace BookStore.Services
 
         public async Task UpdateAsync(int id, CreateReviewDto reviewDto)
         {
-            var review = await _feedbackRepository.GetReviewByIdAsync(id);
+            var review = await _feedbackRepository.GetReviewByIdAsync(id) 
+                ?? throw new Exception("Review not found");
 
+       
+            var book = await _bookRepository.GetBookByIdAsync(review.BookId) 
+                ?? throw new Exception("Book not found");
 
 
             _mapper.Map(reviewDto, review);
+             await _feedbackRepository.SaveAsync(review);
+
+            var allReviews = await _feedbackRepository.GetReviewsByBookIdAsync(book.BookId);
+            var averageRating = allReviews.Any() ? allReviews.Average(r => r.Rating) : 0;
+
+     
+            book.Rating = averageRating;
 
             await _feedbackRepository.SaveAsync(review);
         }

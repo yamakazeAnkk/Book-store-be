@@ -29,6 +29,14 @@ namespace BookStore.Services
             _emailService =  emailService;
         }
 
+        public async Task<bool> ChangePasswordAsync(int userId, string newPassword)
+        {
+            if (string.IsNullOrWhiteSpace(newPassword) || newPassword.Length < 6)
+                throw new ArgumentException("Mật khẩu không hợp lệ.");
+
+            return await _userRepository.ChangePasswordAsync(userId, newPassword); 
+        }
+
         public async Task<PaginatedResult<UserDetailDto>> FilterByUserAsync(FilterUserDto filterUserDto, int page, int size)
         {
             var user = await _userRepository.FilterByUserAsync(filterUserDto,page,size);
@@ -102,7 +110,7 @@ namespace BookStore.Services
             await _userRepository.UpdateIsActionUserAsync(id,isAction);
         }
 
-        public async Task UpdateUserAsync(int id, CreateUserDetailDto createUserDetailDto)
+        public async Task UpdateAdminAsync(int id, CreateUserDetailDto createUserDetailDto)
         {
             var user = await _userRepository.GetUserByIdAsync(id);
             if(user == null || user.RoleId != 2 && user.RoleId != 3 ){
@@ -112,6 +120,25 @@ namespace BookStore.Services
             await _userRepository.UpdateUserByAsync(user);
 
             
+        }
+
+        public async Task<bool> UpdateUserAsync(string email, UpdateUserDto updateUserDto,string imageUrl)
+        {
+            var user = await _userRepository.GetUserByEmailAsync(email);
+            if(user == null){
+                throw new Exception("User not found");
+            }
+            _mapper.Map(updateUserDto,user);
+            user.ProfileImage = imageUrl;
+            await _userRepository.UpdateUserByAsync(user);
+            return true;
+        }
+
+       
+
+        public Task<bool> UpdateUserAsync(string email, UpdateUserDto updateUserDto)
+        {
+            throw new NotImplementedException();
         }
     }
 }

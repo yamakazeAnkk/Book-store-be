@@ -31,7 +31,7 @@ namespace BookStore.Services
         public async Task<string> UploadImageAsync(IFormFile file)
         {
             if (file == null || !file.ContentType.StartsWith("image/"))
-            {
+            { 
                 throw new ArgumentException("Invalid image file");
             }
 

@@ -32,5 +32,33 @@ namespace BookStore.Repositories
                 ReviewCount = reviewCount
             };
         }
+
+        public async Task<IEnumerable<decimal>> GetTotalRevenueByYearAsync(int year)
+        {
+            if(year < 2024){
+                throw new ArgumentException("Invalid year");
+            }
+            var months = new List<decimal>();
+            for(int i = 1; i <= 12; i++){
+                var totalForMonth = await _bookStoreContext.Orders
+                .Where(o => o.Status == "Completed" && o.OrderDate.Year == year && o.OrderDate.Month == i)
+                .SumAsync(o => o.TotalAmount);
+                months.Add(totalForMonth);
+            }
+            return months.AsEnumerable();
+        }
+
+        public async Task<IEnumerable<decimal>> GetTotalRevenueByYearsAsync(int startYear, int endYear)
+        {
+            var years = new List<decimal>();
+            for(int i = startYear; i <= endYear; i++){
+                var totalForYear = await _bookStoreContext.Orders
+                .Where(o => o.Status == "Completed" && o.OrderDate.Year == i)
+                .SumAsync(o => o.TotalAmount);
+                years.Add(totalForYear);
+             
+            }
+            return years.AsEnumerable();
+        }
     }
 }

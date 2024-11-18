@@ -24,7 +24,7 @@ namespace BookStore.Repositories
             }
             bool hasReview = await _context.Reviews
                 .AnyAsync(r => r.BookId == review.BookId && r.UserId == review.UserId);
-            if (!hasReview)
+            if (hasReview)
             {
                throw new InvalidOperationException("User can only review a book once.");
             }

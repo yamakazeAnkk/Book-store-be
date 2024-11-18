@@ -9,5 +9,8 @@ namespace BookStore.Services.Interfaces
     public interface IQuantityService
     {
         Task<DashboardStatisticsDto> GetDashboardStatisticsAsync();
+
+        Task<IEnumerable<decimal>> GetMonthlyCompletedRevenueFor2024Async(int year);
+        Task<IEnumerable<decimal>> GetTotalRevenueByYearsAsync(int startYear ,int endYear);
     }
 }
