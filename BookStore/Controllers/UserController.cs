@@ -85,14 +85,29 @@ namespace BookStore.Controllers
             return Ok();
         } 
         [HttpPost("change-password")]
-        public async Task<IActionResult> ChangePassword([FromForm] int userId, string newPassword)
+        public async Task<IActionResult> ChangePassword([FromForm] ChangePasswordDto changePasswordDto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState); 
 
-            var result = await _userService.ChangePasswordAsync(userId, newPassword); 
-            if (!result) return NotFound("Người dùng không tồn tại."); 
+            var emailUser = User.FindFirst(ClaimTypes.Email)?.Value;
+            try
+            {
+                 if (string.IsNullOrEmpty(emailUser))
+                {
+                    return Unauthorized("User not authenticated");
+                }
 
-            return Ok("Mật khẩu đã được thay đổi thành công."); 
+                var result = await _userService.ChangePasswordAsync(emailUser,changePasswordDto.OldPassword,changePasswordDto.NewPassword); 
+                if (!result) return NotFound("Không thể thay đổi mật khẩu"); 
+
+                return Ok("Mật khẩu đã được thay đổi thành công."); 
+            }
+            catch (System.Exception ex)
+            {
+                
+                return BadRequest(ex.Message);
+            }
+           
         }
        
         [Authorize(Roles = "admin,user")]

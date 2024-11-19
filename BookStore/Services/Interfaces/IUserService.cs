@@ -25,9 +25,11 @@ namespace BookStore.Services.Interfaces
 
         Task<string> GenerateAndSendTokenAsync(string email);
 
-        Task<bool> ChangePasswordAsync(int userId, string newPassword);
+        Task<bool> ChangePasswordAsync(string email, string oldPassword,string newPassword);
 
         Task<bool> UpdateUserAsync(string email,UpdateUserDto updateUserDto,string imageUrl);
+
+        
 
         
 

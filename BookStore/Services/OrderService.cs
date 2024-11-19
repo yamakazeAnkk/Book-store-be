@@ -250,7 +250,7 @@ namespace BookStore.Services
             if(user == null){
                 throw new Exception("User not found");
             }
-            orders.Status = "Cancel";
+            orders.Status = "Canceled";
             await _orderRepository.UpdateOrderAsync(orders);
         }
 

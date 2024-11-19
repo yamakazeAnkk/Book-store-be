@@ -29,12 +29,21 @@ namespace BookStore.Services
             _emailService =  emailService;
         }
 
-        public async Task<bool> ChangePasswordAsync(int userId, string newPassword)
+        public async Task<bool> ChangePasswordAsync(string email,string oldPassword, string newPassword)
         {
             if (string.IsNullOrWhiteSpace(newPassword) || newPassword.Length < 6)
                 throw new ArgumentException("Mật khẩu không hợp lệ.");
+            var user = await _userRepository.GetUserByEmailAsync(email);
+            if(user == null ) throw new Exception("Người dùng không tồn tại.");
 
-            return await _userRepository.ChangePasswordAsync(userId, newPassword); 
+            var isOldPasswordCorrect = BCrypt.Net.BCrypt.Verify(oldPassword, user.Password);
+            if (!isOldPasswordCorrect)
+                 throw new Exception("Mật khẩu cũ không chính xác.");
+
+            var hashedNewPassword = BCrypt.Net.BCrypt.HashPassword(newPassword);
+            user.Password = hashedNewPassword;
+
+            return await _userRepository.ChangePasswordAsync(user); 
         }
 
         public async Task<PaginatedResult<UserDetailDto>> FilterByUserAsync(FilterUserDto filterUserDto, int page, int size)
@@ -89,8 +98,9 @@ namespace BookStore.Services
 
         public async Task<User> RegisterUserAsync(UserDto userDto)
         {
-            var userExists = await _userRepository.GetUserByNameAsync(userDto.Username);
-            if(userExists != null){
+            var existsEmail = await _userRepository.GetUserByEmailAsync(userDto.Email);
+            var existsName = await _userRepository.GetUserByNameAsync(userDto.Username);
+            if(existsEmail != null || existsName != null){
                 throw new ArgumentException("Username already exists.");
             }
       
@@ -100,7 +110,7 @@ namespace BookStore.Services
             user.RoleId = 3;
             
             await _userRepository.AddUserAsync(user);
-            await _userRepository.SaveChangeAsync();
+          
             return user;
             
         }

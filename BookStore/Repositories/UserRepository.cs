@@ -24,14 +24,10 @@ namespace BookStore.Repositories
             await _bookStoreContext.Users.AddAsync(user);
         }
 
-        public async Task<bool> ChangePasswordAsync(int userId, string newPassword)
+        public async Task<bool> ChangePasswordAsync(User user)
         {
-            var user = await GetUserByIdAsync(userId);
-            if(user == null) return false;
-            user.Password = BCrypt.Net.BCrypt.HashPassword(newPassword);
             _bookStoreContext.Users.Update(user);
-            await _bookStoreContext.SaveChangesAsync();
-            return true;
+            return await _bookStoreContext.SaveChangesAsync() > 0;
         }
 
         public async Task<PaginatedResult<User>> FilterByUserAsync(FilterUserDto filterUserDto,int page,int size)

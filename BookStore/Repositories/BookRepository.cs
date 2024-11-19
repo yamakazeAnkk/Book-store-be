@@ -184,8 +184,7 @@ namespace BookStore.Repositories
             var threeMonthsAgo = DateTime.Now.AddMonths(-3);
 
             var query = _bookStoreContext.Books
-                .Where(b =>
-                
+                .Where(b => b.IsSale == 1 &&
                     // Sách chưa từng được order
                     (!b.OrderItems.Any() && b.UploadDate <= threeMonthsAgo) ||
                     // Trong OrderItems quá 3 tháng
@@ -277,7 +276,7 @@ namespace BookStore.Repositories
 
         public async Task UpdateBookAsync(Book book)
         {
-            book.UploadDate = DateTime.Now;
+            
             
             var entry = _bookStoreContext.Entry(book);
             
@@ -285,7 +284,7 @@ namespace BookStore.Repositories
                 _bookStoreContext.Books.Attach(book);
               
             }
-            entry.Property(b => b.UploadDate).IsModified = true;
+            entry.Property(b => b.UploadDate).IsModified = false;
             await _bookStoreContext.SaveChangesAsync();
 
         }
