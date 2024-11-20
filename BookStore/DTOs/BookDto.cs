@@ -22,6 +22,8 @@ namespace BookStore.DTOs
 
         public int IsSale { get; set; }
 
+        public DateTime UploadDate { get; set; }
+
         // public string? Description { get; set; }
 
         // public string? Ebook { get ; set; }
