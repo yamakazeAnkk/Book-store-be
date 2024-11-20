@@ -35,9 +35,7 @@ namespace BookStore.Repositories
 
         public async Task<IEnumerable<decimal>> GetTotalRevenueByYearAsync(int year)
         {
-            if(year < 2024){
-                throw new ArgumentException("Invalid year");
-            }
+           
             var months = new List<decimal>();
             for(int i = 1; i <= 12; i++){
                 var totalForMonth = await _bookStoreContext.Orders
