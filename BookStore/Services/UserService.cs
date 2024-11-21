@@ -9,6 +9,7 @@ using BookStore.Models;
 using BookStore.Repositories;
 using BookStore.Repositories.Interfaces;
 using BookStore.Services.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookStore.Services
@@ -22,11 +23,14 @@ namespace BookStore.Services
 
         private readonly Random _random;
 
+       
+
         public UserService(IUserRepository userRepository, IMapper mapper, IEmailService emailService, Random random){
             _userRepository = userRepository;
             _mapper = mapper;
             _random = random;
             _emailService =  emailService;
+            
         }
 
         public async Task<bool> ChangePasswordAsync(string email,string oldPassword, string newPassword)
@@ -110,7 +114,7 @@ namespace BookStore.Services
             user.RoleId = 3;
             
             await _userRepository.AddUserAsync(user);
-          
+            await _userRepository.SaveChangeAsync();
             return user;
             
         }
@@ -147,6 +151,11 @@ namespace BookStore.Services
        
 
         public Task<bool> UpdateUserAsync(string email, UpdateUserDto updateUserDto)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<string> GenerateResetPasswordTokenAsync(string email)
         {
             throw new NotImplementedException();
         }

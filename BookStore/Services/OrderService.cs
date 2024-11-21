@@ -271,6 +271,14 @@ namespace BookStore.Services
             return new PaginatedResult<OrderDetailDto>(orderDto, orders.TotalCount, size);
         }
 
-        
+        public async Task UpdateOrderInformationAsync(int orderId, UpdateOrderInformationDto updateOrderInformationDto)
+        {
+            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+            if(order == null){
+                throw new Exception("Order not found");
+            }
+             _mapper.Map(updateOrderInformationDto,order);
+            await _orderRepository.UpdateOrderAsync(order);
+        }
     }
 }

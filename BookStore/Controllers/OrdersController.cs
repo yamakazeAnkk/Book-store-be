@@ -143,5 +143,20 @@ namespace BookStore.Controllers
             var order = await _orderService.FilterOrderByStateAsync(status,page,size);
             return Ok(order);
         }
+
+        [HttpPut("update-information")]
+        public async Task<IActionResult> UpadeOrderInformation(int id, [FromBody] UpdateOrderInformationDto updateOrderInformationDto)
+        {
+            try
+            {
+                await _orderService.UpdateOrderInformationAsync(id, updateOrderInformationDto);
+                return Ok(new { message = "Order information updated successfully." });
+            }
+            catch (System.Exception ex)
+            {
+                
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
     }
 }

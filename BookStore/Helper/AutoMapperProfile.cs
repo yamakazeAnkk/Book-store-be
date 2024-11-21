@@ -80,9 +80,11 @@ namespace BookStore.Helper
             CreateMap<UserPrivateDto,User>().ReverseMap();
             CreateMap<UpdateUserDto,User>().ReverseMap();
 
-            CreateMap(typeof(PaginatedResult<>), typeof(PaginatedResult<>))
-            .ConvertUsing(typeof(PaginatedResultConverter<,>));
+            CreateMap<UpdateOrderInformationDto,Order>().ReverseMap();
 
+            CreateMap(typeof(PaginatedResult<>), typeof(PaginatedResult<>))
+                .ConvertUsing(typeof(PaginatedResultConverter<,>));
+            
 
 
         }       

@@ -29,7 +29,7 @@ namespace BookStore.Services.Interfaces
 
         Task<bool> UpdateUserAsync(string email,UpdateUserDto updateUserDto,string imageUrl);
 
-        
+        Task<string> GenerateResetPasswordTokenAsync(string email);
 
         
 

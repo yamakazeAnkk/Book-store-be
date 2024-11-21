@@ -21,7 +21,7 @@ namespace BookStore.Services.Interfaces
 
         Task CancelOrderAsync(int orderId , string userName);
 
-
+        Task UpdateOrderInformationAsync(int orderId, UpdateOrderInformationDto updateOrderInformationDto);
         Task<decimal> GetTotalRevenueByQuarterAsync(int year, int quarter);
         Task<decimal> GetTotalRevenueByYearAsync(int year);
 
