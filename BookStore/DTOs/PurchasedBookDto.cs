@@ -13,7 +13,7 @@ namespace BookStore.DTOs
         
         public decimal Price { get; set; }
 
-        public string? Ebook { get ; set; }
+        public string? LinkEbook { get ; set; }
 
         public decimal? Rating { get; set; }
 
