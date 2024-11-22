@@ -10,6 +10,7 @@ using BookStore.Services.Interfaces;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.VisualBasic;
@@ -22,7 +23,22 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
-builder.Services.AddControllers();
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+        options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
+    })
+    
+    ;
+
+builder.Services.AddControllers()
+    .AddNewtonsoftJson(options =>
+    {
+        options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+    });
+
 
 // registration firebase
 
@@ -31,10 +47,15 @@ FirebaseApp.Create(new AppOptions(){
     
 });
 
+
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
+    c.OperationFilter<FormFileSwaggerFilter>();
+    
+
     c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "My API", Version = "v1" });
 
     // Define the OAuth2.0 scheme that's in use (JWT Bearer)
@@ -67,6 +88,8 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+
+
 // database connection string sql server
 builder.Services.AddDbContext<BookStoreContext>( option => 
     option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")),
@@ -77,6 +100,34 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IBookRepository,BookRepository>();
 builder.Services.AddScoped<IBookService,BookService>();
+builder.Services.AddScoped<IBrandRepository, BrandRepository>();
+
+builder.Services.AddScoped<ICartItemRepository, CartItemRepository>();
+builder.Services.AddScoped<IOrderItemRepository, OrderItemRepository>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<ICartItemService,CartItemService>();
+
+builder.Services.AddScoped<IFeedBackRepository,FeedBackRepository>();
+builder.Services.AddScoped<IReviewService,ReviewService>();
+
+builder.Services.AddScoped<IBrandService,BrandService>();
+
+builder.Services.AddScoped<IVoucherRepository,VoucherRepository>();
+builder.Services.AddScoped<IVoucherUserRepository,VoucherUserRepository>();
+
+builder.Services.AddScoped<IVoucherService,VoucherService>();
+
+builder.Services.AddScoped<IQuantityRepository,QuantityRepository>();
+builder.Services.AddScoped<IQuantityService,QuantityService>();
+
+builder.Services.AddScoped<IFileUploadService,FileUploadService>();
+
+builder.Services.AddScoped<IPurchasedEbookRepository,PurchasedEbookRepository>();
+
+builder.Services.AddScoped<IEmailService,EmailService>();
+
+builder.Services.AddSingleton<Random>();
 
 
 // sign up service Authentication and jwt 
@@ -112,6 +163,14 @@ builder.Services.AddAuthentication(option => {
     };
 });
 
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddCors(p => p.AddPolicy("AllowAllOrigins", build =>
+{
+    build.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+}));
+builder.Services.AddSignalR();
+
+// Thêm vào middleware
 
 
 var app = builder.Build();
@@ -124,8 +183,8 @@ if (app.Environment.IsDevelopment())
 }
 
 
-app.UseHttpsRedirection();
-
+app.MapHub<NotificationHub>("/notificationHub");
+app.UseCors("AllowAllOrigins");
 
 app.UseAuthentication();
 app.UseAuthorization();
