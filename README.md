@@ -37,12 +37,14 @@ Thay TÊN_SERVER bằng tên server SQL của bạn.
 ### 5. Áp dụng migrations
 Sau khi tạo migration, áp dụng các thay đổi vào cơ sở dữ liệu bằng lệnh:
 ```bash
-   dotnet ef migrations add <TênMigration>
+dotnet ef migrations add <TênMigration>
 ```
 Áp dụng các thay đổi vào cơ sở dữ liệu:
 ```bash
 dotnet ef database update
 ```
+lưu ý 
+add file **data.sql vào database
 ### 6. Chạy API
 Khởi động ứng dụng bằng lệnh:
 ```bash
